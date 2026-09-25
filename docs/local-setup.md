@@ -17,8 +17,8 @@ In the repo:
 Not in git (`data/` is missing on a fresh clone):
 
 - `data/tiles/censo2022.pmtiles` — build it with `tile-join` (below)
-- `data/tiles/censo2022_income.pmtiles` and `censo2022_deaths.pmtiles`
-- `data/tiles/hover.pmtiles` — município (z3–9) and setor (z10–12, overzoom after) hover; `python3 scripts/ibge_uf.py tiles`
+- `data/tiles/censo2022_income.pmtiles`, `censo2022_deaths.pmtiles`, and `censo2022_religion.pmtiles`
+- `data/tiles/hover.pmtiles` — município (z3–9), setor (z10–12), and `aponds` (z3–12, Religião only); `python3 scripts/ibge_uf.py tiles` or `aponds`
 - `data/censo2022/output/tiles/race/census_tract.geojson` — intermediate for hover tiles (do not load in the browser)
 - `data/censo2022/output/tiles/race/municipality.geojson` — intermediate for hover tiles
 
@@ -47,6 +47,7 @@ mkdir -p data/tiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022.pmtiles tiles/*/*/tiles.mbtiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_income.pmtiles tiles/income/*/*/tiles.mbtiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_deaths.pmtiles tiles/deaths/*/*/tiles.mbtiles
+tile-join -f --no-tile-size-limit -o data/tiles/censo2022_religion.pmtiles tiles/religion/*/*/tiles.mbtiles
 python3 scripts/ibge_uf.py tiles
 
 # 2. Page + archives on one port. scripts/serve.py speaks Range; some Python
@@ -54,7 +55,9 @@ python3 scripts/ibge_uf.py tiles
 python3 scripts/serve.py
 ```
 
-Open `http://localhost:8000`. The switcher shows **Raça** and **Renda** (Óbitos stays hidden; `HIDDEN_VIEWS` in `index.html`). Race tiles are versioned; Renda/Óbitos need the local theme join above.
+`serve.py` also sends CORS `*` on every response so Remotion Studio (`:3000`) can Range-GET the same `.pmtiles`. The map page is same-origin and ignores that.
+
+Open `http://localhost:8000`. The switcher shows **Raça**, **Renda**, and **Religião** (Óbitos stays hidden; `HIDDEN_VIEWS` in `index.html`). Race tiles are versioned; Renda/Óbitos/Religião need the local theme join above. Religião also needs the controlled sample expand (`python3 scripts/build_religion_apond.py expand`) — do not commit those CSVs.
 
 On localhost a top-right **dev** button (or `D` / `` ` ``) toggles a HUD. Zoom and raio are sliders (raio is a 0.5×–3× multiplier on the coded radius curve; **reset** returns to 1×). `1` jumps to the Brazil overview; `2` jumps to Rio at zoom 15 (tiles still max out at 14). It is not injected on `carabetta.xyz`.
 
@@ -94,6 +97,17 @@ printf '%s\n' AC AL AM AP BA CE DF ES GO MA MG MS MT PA PB PE PI PR RJ RN RO RR 
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_income.pmtiles tiles/income/*/*/tiles.mbtiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_deaths.pmtiles tiles/deaths/*/*/tiles.mbtiles
 python3 scripts/ibge_uf.py
+```
+
+Religion (sample → APOND → dasymetric tiles). Controlled `Pessoas_*_controlado.csv` stay in Downloads — never commit them:
+
+```sh
+python3 scripts/build_religion_apond.py expand
+printf '%s\n' AC AL AM AP BA CE DF ES GO MA MG MS MT PA PB PE PI PR RJ RN RO RR RS SC SE SP TO \
+  | xargs -P 2 -n 1 -I{} ./scripts/build_theme_uf.sh {} religion
+tile-join -f --no-tile-size-limit -o data/tiles/censo2022_religion.pmtiles tiles/religion/*/*/tiles.mbtiles
+python3 scripts/build_religion_apond.py hover   # optional: dissolve again (drops water leftovers)
+python3 scripts/ibge_uf.py aponds              # rebuilds hover.pmtiles (replaces aponds, does not stack)
 ```
 
 3. Generate dots and per-UF MBTiles for that UF. A full run regenerates 7–14 for that state only, then joins a national PMTiles:

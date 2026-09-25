@@ -19,7 +19,7 @@ Local `python3 scripts/serve.py` does not send events.
 | Event | When | Props |
 |-------|------|-------|
 | *(pageview)* | Production page load (Umami auto-track) | path `/dotsbr/` |
-| `view_switch` | Click on Raça / Renda (desktop or sheet) | `view`: `race` \| `income` (`deaths` stays hidden) |
+| `view_switch` | Click on Raça / Renda / Religião (desktop or sheet) | `view`: `race` \| `income` \| `religion` (`deaths` stays hidden) |
 | `share` | Click **Compartilhar** (intent, including a cancelled OS sheet) | `via`: `native` \| `download` |
 
 Custom events use `trackEvent` in `index.html` (`window.umami.track`). Property values are only string / number / boolean.

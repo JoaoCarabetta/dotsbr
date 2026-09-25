@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <title>dotsbr — filme de 15s</title>
+    <!--
+      Deterministic 15-second promo for dotsbr: one live MapLibre instance with
+      the real PMTiles, plus DOM motion graphics on top. Nothing here animates
+      itself — `promo.js` paints exactly one frame at a time — so the same frame
+      number always produces the same pixels and `scripts/capture_promo.mjs` can
+      screenshot it into an MP4.
+
+      Same pinned library versions as index.html, so the dots in the film are
+      rendered by the same engine as the dots in the product.
+
+      Open by hand:  http://127.0.0.1:8000/promo/?frame=120
+      Play in place: http://127.0.0.1:8000/promo/?play=1
+      (needs `python3 scripts/serve.py` for the HTTP Range the PMTiles need)
+    -->
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+    <link rel="stylesheet" href="promo.css">
+</head>
+<body>
+<!-- Fixed 1920×1080 stage: the capture script sets the viewport to match, and
+     a browser window of any size letterboxes it instead of reflowing. -->
+<div id="stage">
+    <div id="map"></div>
+
+    <!-- ---------- opening: the country assembles ---------- -->
+    <div class="scrim" id="scrim"></div>
+
+    <div class="open-title" id="open-title">
+        <div class="kicker"><i class="rule" id="kicker-rule"></i>Censo de 2022</div>
+        <div class="line-mask"><div class="line" id="title-line-1">O Brasil,</div></div>
+        <div class="line-mask"><div class="line" id="title-line-2">ponto por ponto</div></div>
+    </div>
+
+    <div class="counter" id="counter">
+        <div class="counter-value" id="counter-value">0</div>
+        <div class="counter-label" id="counter-label">pessoas contadas, uma por uma</div>
+    </div>
+
+    <!-- ---------- race shares + solos ---------- -->
+    <div class="shares" id="shares">
+        <div class="shares-title">A cor que cada um declarou</div>
+        <div id="shares-rows"></div>
+        <div class="shares-foot" id="shares-foot"></div>
+    </div>
+
+    <div class="solo" id="solo">
+        <div class="solo-name" id="solo-name"></div>
+        <div class="solo-count" id="solo-count"></div>
+        <div class="solo-note">Cada grupo tem a sua própria geografia.</div>
+    </div>
+
+    <!-- ---------- product chrome ---------- -->
+    <div class="panel" id="panel">
+        <h1 class="panel-title" id="panel-title">dotsbr por Raça</h1>
+        <p class="dot-scale" id="dot-scale">1 ponto = 2.000 pessoas</p>
+        <div class="switcher" id="switcher">
+            <div class="switcher-chip" id="switcher-chip"></div>
+            <div class="switcher-slot" data-lens="race">Raça</div>
+            <div class="switcher-slot" data-lens="income">Renda</div>
+            <div class="switcher-slot" data-lens="religion">Religião</div>
+        </div>
+        <p class="explainer" id="explainer"></p>
+        <p class="legend-scope" id="legend-scope">% do que está na tela</p>
+        <div id="legend-rows"></div>
+    </div>
+
+    <div class="search" id="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2.4" stroke-linecap="round">
+            <circle cx="10.5" cy="10.5" r="6.5"></circle>
+            <path d="M15.5 15.5 L21 21"></path>
+        </svg>
+        <span>Busque por cidade, bairro, estado ou CEP</span>
+    </div>
+
+    <div class="footer" id="footer">
+        <span>Dados: IBGE · Censo Demográfico 2022</span>
+        <span>GitHub · Carabetta.xyz · © 2026 Carabetta.xyz</span>
+    </div>
+
+    <div class="fly-caption" id="fly-caption">
+        Aproxime: cada ponto passa a valer <b>menos</b> gente
+    </div>
+
+    <div class="place-pill" id="place-pill">Rio de Janeiro · RJ</div>
+
+    <!-- ---------- using the app: pointer, click, stats popup ---------- -->
+    <div class="ripple" id="ripple"></div>
+    <svg class="pointer" id="pointer" viewBox="0 0 24 24">
+        <path d="M4 2 L4 19.2 L8.6 14.8 L11.7 22 L15.2 20.4 L12.1 13.5 L18.4 13 Z"
+              fill="#fff" stroke="#202124" stroke-width="1.4" stroke-linejoin="round"></path>
+    </svg>
+    <div class="stats-card" id="stats-card">
+        <div class="stats-title">Rio de Janeiro</div>
+        <div id="stats-rows"></div>
+        <div class="stats-total">
+            <span>População</span><span id="stats-total-value"></span>
+        </div>
+    </div>
+
+    <!-- ---------- payoff cards ---------- -->
+    <div class="insight" id="insight-income">
+        <div class="kicker"><i class="rule"></i>Renda · Rio de Janeiro</div>
+        <div class="insight-title">A mesma cidade, dois países</div>
+        <div class="ends">
+            <div class="end">
+                <i class="end-bar" id="income-bar-low"></i>
+                <div class="end-label">10% mais pobres</div>
+                <div class="end-value" id="income-value-low"></div>
+            </div>
+            <div class="end">
+                <i class="end-bar" id="income-bar-high"></i>
+                <div class="end-label">10% mais ricos</div>
+                <div class="end-value" id="income-value-high"></div>
+            </div>
+            <div class="end-ratio" id="income-ratio"></div>
+        </div>
+        <div class="insight-note" id="income-note"></div>
+    </div>
+
+    <div class="insight" id="insight-religion">
+        <div class="kicker"><i class="rule"></i>Religião · Brasil</div>
+        <div class="insight-title">A fé também tem endereço</div>
+        <div id="religion-rows"></div>
+        <div class="insight-note">
+            Entre as pessoas de 10 anos ou mais. A cor é estimada para um conjunto de vizinhanças.
+        </div>
+    </div>
+
+    <!-- ---------- sign-off ---------- -->
+    <div class="end-card" id="end-card">
+        <div class="end-dots" id="end-dots"></div>
+        <div class="line-mask end-wordmark-mask">
+            <div class="end-wordmark" id="end-wordmark">dotsbr</div>
+        </div>
+        <div class="end-tagline" id="end-tagline">O Brasil em pontos</div>
+        <div class="end-url" id="end-url">carabetta.xyz/dotsbr</div>
+        <div class="end-credit" id="end-credit"></div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/pmtiles@3.2.1/dist/pmtiles.js"></script>
+<!-- Plain scripts in dependency order (no bundler): helpers, then the census
+     tables, then the clock, then the map, then the overlays, then the API. -->
+<script src="lib.js"></script>
+<script src="data.js"></script>
+<script src="timeline.js"></script>
+<script src="map.js"></script>
+<script src="overlay.js"></script>
+<script src="promo.js"></script>
+</body>
+</html>

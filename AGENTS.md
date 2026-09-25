@@ -4,7 +4,7 @@ Instruções para agentes que trabalham neste repositório. Leia isto antes de e
 
 ## O que é este projeto
 
-**dotsbr** (repo `JoaoCarabetta/dotsbr`; checkout local ainda pode se chamar `dotmap`) é um mapa de densidade de pontos do Censo Demográfico 2022 (IBGE). Raça, renda do responsável e idade ao falecer cobrem as 27 UFs. A unidade do ponto muda por view e zoom.
+**dotsbr** (repo `JoaoCarabetta/dotsbr`; checkout local ainda pode se chamar `dotmap`) é um mapa de densidade de pontos do Censo Demográfico 2022 (IBGE). Raça, renda do responsável e religião (amostra, área de ponderação) cobrem as 27 UFs; idade ao falecer existe no pipeline mas fica oculta na UI. A unidade do ponto muda por view e zoom. Religião não afina o recorte da cor no zoom.
 
 Produto associado ao Escritório de Dados.
 
@@ -18,6 +18,7 @@ Produto associado ao Escritório de Dados.
 | Pipeline de pontos | `makefiles.sh` (mapshaper, tippecanoe, tile-join) — **não** rode só para ver o mapa |
 | Tratamento de dados | `notebooks/treat_2022.ipynb` (pandas, geopandas, geobr) |
 | Python | 3.12+, gerenciado com `uv` (`pyproject.toml`) |
+| Vídeo (exemplo) | Remotion 4 em `video/` — promo com PMTiles reais, flyTo Brasil→Rio, light-v10 opcional |
 
 ## Comandos locais
 
@@ -28,6 +29,7 @@ mkdir -p data/tiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022.pmtiles tiles/*/*/tiles.mbtiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_income.pmtiles tiles/income/*/*/tiles.mbtiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_deaths.pmtiles tiles/deaths/*/*/tiles.mbtiles
+tile-join -f --no-tile-size-limit -o data/tiles/censo2022_religion.pmtiles tiles/religion/*/*/tiles.mbtiles
 python3 scripts/serve.py
 ```
 
@@ -35,7 +37,7 @@ A página fica em `http://localhost:8000` (`python3 scripts/serve.py --port 8001
 
 Sem restaurar arquivos extras: pontos funcionam; hover (`data/tiles/hover.pmtiles`) dá 404 até `python3 scripts/ibge_uf.py tiles`. Detalhes em `docs/local-setup.md`.
 
-Público: https://carabetta.xyz/dotsbr/ (repo `carabetta.xyz`; o slug antigo `/dataviz/brazildots/` redireciona). Push em `main` ou `master` neste repo publica o `index.html`, o `og.html`, o `card.jpg` e os favicons (`.github/workflows/deploy.yml`). Nginx no `carabetta.xyz` entrega `og.html` ao user-agent do WhatsApp. O HTML pede `data/tiles/*.pmtiles` relativo à página; no VPS servir os arquivos como estáticos com `Accept-Ranges: bytes` e `gzip off` — o container tileserver-gl-light deixa de ser necessário. Detalhes em [`docs/deploy.md`](docs/deploy.md).
+Público: https://carabetta.xyz/dotsbr/ (repo `carabetta.xyz`; o slug antigo `/dataviz/brazildots/` redireciona). Push em `main` ou `master` neste repo publica o `index.html`, o `og.html`, o `card.jpg` e os favicons (`.github/workflows/deploy.yml`). Nginx no `carabetta.xyz` entrega `og.html` ao user-agent do WhatsApp. O HTML pede `data/tiles/*.pmtiles` relativo à página; no VPS servir os arquivos como estáticos com `Accept-Ranges: bytes` e `gzip off` — o container tileserver-gl-light deixa de ser necessário. A CSP do site precisa de `worker-src 'self' blob:` (e `blob:` em `script-src` / `img-src`): sem isso o MapLibre 4.7 não decodifica tiles e o mapa em produção fica em branco. Detalhes em [`docs/deploy.md`](docs/deploy.md).
 
 Não rode `./makefiles.sh` só para visualizar: exige UF (`./makefiles.sh RR`), precisa de GeoJSON que não está no git, e um run completo regenera 7–14 daquela UF (caro). Tiles de outras UFs não são apagados. Para só 3–6: `python3 scripts/build_density_clusters.py RR` e `./makefiles.sh RR 3,4,5,6`. Loop nacional: `SKIP_TILE_JOIN=1` por UF e um `tile-join` no fim.
 
@@ -46,24 +48,28 @@ Servidor: `python3 scripts/serve.py` (Range em `.pmtiles`). Alternativa: `uv run
 ## Mapa de arquivos
 
 - `docs/user-analytics.md` — Umami em produção (`analytics.carabetta.xyz`, site **dotsbr-prod**); loopback não envia eventos. Não há Google Analytics.
-- `index.html` — UI, estilo, tags Open Graph / Twitter Card no `<head>` (preview do WhatsApp; tags no topo do head porque o crawler para cedo), favicon (`favicon.svg` / `.ico` / `apple-touch-icon.png`), tracker Umami só fora de localhost, botão **Compartilhar** (card 4:5 da câmera atual + pill do lugar + `navigator.share`), **um painel único** flutuante no desktop (story-first: h1 com a view, linha-herói `1 ponto = N` com estado de filtro, seletor, explainer, legenda com scroll próprio em telas baixas, e slot de stats fixado por **clique** — hover mantém o popup no cursor; clique vazio/✕/troca de view fecham o slot; a **busca é uma pill flutuante logo à direita do painel, alinhada ao topo**, `#desk-search`), rodapé fino, detalhes de hover e **toda** a lógica do mapa. O painel tem seletor **Raça / Renda** (**Óbitos existe no pipeline/tiles mas está oculto na UI** via `HIDDEN_VIEWS` em `index.html`; para reexibir, restaure o botão nos dois seletores e tire `deaths` do set). Basemap único: `light-v10` com labels só de cidade e bairro (`settlement-label` / `settlement-subdivision-label`; rua/POI/UF/país ficam off). A legenda e `1 ponto = N unidades` mudam por view. Painel **dev** só em loopback (`localhost` / `127.0.0.1` / `::1` / `*.localhost`): botão no canto superior direito ou `D` / `` ` ``, `sessionStorage` `dotmap-dev-panel`; mostra unidades/ponto, centro, bbox, hover e fonte dos tiles; ferramentas de paleta aparecem só em Raça. Mapa full-bleed (`#map` 100vw/100vh, com fallback `100dvh`), sem header em barra nem rail esquerdo. Título: o `h1` do desktop e o título do sheet mobile carregam a view ativa — **dotsbr por Raça/Renda** (Óbitos oculto) — reescritos no switch; o `<title>` da página permanece só **dotsbr**. Cada view reescreve também o explainer. Rodapé slim em duas pontas: esquerda = créditos de dados/IBGE; direita = GitHub · Carabetta.xyz · ©. **Mobile (≤640px)**: gramática Waze — cards e rodapé do desktop somem e tudo vive em **um bottom sheet** (`.m-chrome`, estados peek/half/full por drag no header, pointer events + transform, `sessionStorage` `dotmap-sheet-state`, primeira visita abre em half). Peek mostra título + `1 ponto = N` + **Compartilhar** — o título do sheet (`#sheet-title`) carrega a view ativa (**dotsbr por Raça/Renda**, atualizado no switch; Óbitos oculto); half soma seletor de view + explainer; full soma legenda com linhas de 44px + solo e os **créditos** (não há rodapé mobile). A **busca fica fixa no topo da tela** (`#m-search-bar`, pill branca flutuante, safe-area-top; o geocoder único é re-parented para lá no mobile e volta à pill à direita do painel no desktop; o chip dev de localhost pode sobrepor a barra — não é parte do design). Sobre o mapa: **chip rail** de legenda (tap filtra, long-press = só); **sem** botões de zoom nem FAB no mobile (pinch faz o zoom; o NavigationControl fica `display:none` em ≤640px, atribuição Mapbox permanece). **Tap** no polígono mostra um card de stats **ancorado** acima do sheet (✕ ou tap no vazio fecha); tap com sheet aberto só o recolhe. Safe-areas via `env(safe-area-inset-*)` + `viewport-fit=cover`. Detalhes em `docs/docs.md`.
+- `docs/video.md` — exemplo Remotion (`video/`): preview no Studio, o que é ilustração vs tiles.
+- `video/` — composições `Dotsbr` (1920×1080) e `DotsbrMobile` (1080×1920), ~20s: MapLibre + `censo2022.pmtiles`, flyTo Brasil→Rio (z11) via `jumpTo` por frame. Fundo light-v10 se `video/.env` tiver `REMOTION_MAPBOX_TOKEN` (não copie o token para o source). Precisa de `python3 scripts/serve.py` ou da URL pública. Detalhes em `docs/video.md`.
+- `index.html` — UI, estilo, tags Open Graph / Twitter Card no `<head>` (preview do WhatsApp; tags no topo do head porque o crawler para cedo), favicon (`favicon.svg` / `.ico` / `apple-touch-icon.png`), tracker Umami só fora de localhost, botão **Compartilhar** (card 4:5 da câmera atual + pill do lugar + `navigator.share`), **um painel único** flutuante no desktop (story-first: h1 com a view, linha-herói `1 ponto = N` com estado de filtro, seletor, explainer, legenda com scroll próprio em telas baixas, e slot de stats fixado por **clique** — hover mantém o popup no cursor; clique vazio/✕/troca de view fecham o slot; a **busca é uma pill flutuante logo à direita do painel, alinhada ao topo**, `#desk-search`), rodapé fino, detalhes de hover e **toda** a lógica do mapa. O painel tem seletor **Raça / Renda / Religião** (**Óbitos existe no pipeline/tiles mas está oculto na UI** via `HIDDEN_VIEWS` em `index.html`; para reexibir, restaure o botão nos dois seletores e tire `deaths` do set). Religião é amostra (`P0410` × `P0111`, 10+); hover lê `aponds`, nunca setor. Basemap único: `light-v10` com labels só de cidade e bairro (`settlement-label` / `settlement-subdivision-label`; rua/POI/UF/país ficam off). A legenda e `1 ponto = N unidades` mudam por view. Cada linha da legenda (e os chips no mobile) mostra a **% do recorte visível** — soma dos polígonos de hover na tela (município abaixo de zoom 10, setor a partir de 10, APOND na Religião), independente do filtro; Renda usa a mediana da vizinhança × domicílios. Painel **dev** só em loopback (`localhost` / `127.0.0.1` / `::1` / `*.localhost`): botão no canto superior direito ou `D` / `` ` ``, `sessionStorage` `dotmap-dev-panel`; mostra unidades/ponto, centro, bbox, hover e fonte dos tiles; ferramentas de paleta aparecem só em Raça. Mapa full-bleed (`#map` 100vw/100vh, com fallback `100dvh`), sem header em barra nem rail esquerdo. Título: o `h1` do desktop e o título do sheet mobile carregam a view ativa — **dotsbr por Raça/Renda/Religião** (Óbitos oculto) — reescritos no switch; o `<title>` da página permanece só **dotsbr**. Cada view reescreve também o explainer. Rodapé slim em duas pontas: esquerda = créditos de dados/IBGE; direita = GitHub · Carabetta.xyz · ©. **Mobile (≤640px)**: gramática Waze — cards e rodapé do desktop somem e tudo vive em **um bottom sheet** (`.m-chrome`, estados peek/half/full por drag no header, pointer events + transform, `sessionStorage` `dotmap-sheet-state`, primeira visita abre em half). Peek mostra título + `1 ponto = N` + **Compartilhar** — o título do sheet (`#sheet-title`) carrega a view ativa (**dotsbr por Raça/Renda/Religião**, atualizado no switch; Óbitos oculto); half soma seletor de view + explainer; full soma legenda com linhas de 44px + solo e os **créditos** (não há rodapé mobile). A **busca fica fixa no topo da tela** (`#m-search-bar`, pill branca flutuante, safe-area-top; o geocoder único é re-parented para lá no mobile e volta à pill à direita do painel no desktop; o chip dev de localhost pode sobrepor a barra — não é parte do design). Sobre o mapa: **chip rail** de legenda (tap filtra, long-press = só); **sem** botões de zoom nem FAB no mobile (pinch faz o zoom; o NavigationControl fica `display:none` em ≤640px, atribuição Mapbox permanece). **Tap** no polígono mostra um card de stats **ancorado** acima do sheet (✕ ou tap no vazio fecha); tap com sheet aberto só o recolhe. Safe-areas via `env(safe-area-inset-*)` + `viewport-fit=cover`. Detalhes em `docs/docs.md`.
 - `js/map.js` e `js/events.js` — arquivos vazios; não assumir que a lógica mora aí.
 - `config.json` — relíquia do tileserver-gl; **não** é necessário para abrir o mapa.
-- `makefiles.sh` — raça usa `tiles/{UF}/`; temas usam `tiles/{theme}/{UF}/`. Aceita `./makefiles.sh RR income` e `./makefiles.sh RR 3,4,5,6 deaths`. Loop nacional: `./scripts/build_theme_pair.sh` por UF com `xargs -P 2`, depois um `tile-join` por tema (saída nacional `.pmtiles`).
-- `scripts/themes.py` — fontes, campos, categorias, unidades e escalas de raça/renda/óbitos.
+- `makefiles.sh` — raça usa `tiles/{UF}/`; temas usam `tiles/{theme}/{UF}/`. Aceita `./makefiles.sh RR income` e `./makefiles.sh RR 3,4,5,6 deaths` / `religion`. Loop nacional: `./scripts/build_theme_pair.sh` (renda+óbitos) ou `./scripts/build_theme_uf.sh UF religion` com `xargs -P 2`, depois um `tile-join` por tema (saída nacional `.pmtiles`).
+- `scripts/themes.py` — fontes, campos, categorias, unidades e escalas de raça/renda/óbitos/religião.
+- `scripts/build_religion_apond.py` — amostra controlada (`P0111` × `P0410`, 10+) → `apond_religion.csv`; dasimétrico em setor/cluster; hover APOND. `expand` \| `<UF>` \| `all-geo` \| `hover`. Dissolve descarta malha sem `id_apond` (células de água). Não republicar `*_controlado.csv`.
 - `scripts/build_municipality.py` — CSV nacional + malha municipal IBGE → `municipality_{UF}.geojson` (stdlib; sem geopandas).
 - `scripts/build_census_tract.py` — CSV nacional + malha de setor IBGE por UF → `census_tract_{UF}.geojson`.
 - `scripts/build_density_clusters.py` — agrupa setores adjacentes da mesma classe de densidade → `cluster_{UF}_z3.geojson` … `cluster_{UF}_z6.geojson` (stdlib + mapshaper; adjacência via TopoJSON).
 - `scripts/serve.py` — servidor estático com HTTP Range (necessário para PMTiles).
-- `scripts/ibge_uf.py` — códigos IBGE, download, merge do hover concatenado e `tiles` (PMTiles de hover).
+- `scripts/ibge_uf.py` — códigos IBGE, download, merge do hover concatenado e `tiles` / `aponds` (PMTiles de hover, layer `aponds` na view Religião).
 - `scripts/build_municipality_rj.py` — wrapper que chama `build_municipality.py RJ`.
 - `notebooks/treat_2022.ipynb` — cruza microdados do censo com geometria de setores.
-- `docs/docs.md` — zoom, densidade, schema demográfico, filtro na legenda, basemap **light-v10 com labels de cidade/bairro, sem satellite**, chrome (painel único top-left, busca à direita, bottom sheet no mobile, rodapé slim; sem rail/FAB/zoom no mobile), preview de link (Open Graph + `card.jpg` / `og.html`), botão Compartilhar (card 4:5 + pill do município + Web Share), ordem da legenda de raça parda → branca → preta → indígena → amarela, paleta de renda invertida (pobre vermelho → rico azul), Óbitos oculto na UI, painel dev localhost-only.
+- `docs/docs.md` — zoom, densidade, schema demográfico, filtro na legenda, basemap **light-v10 com labels de cidade/bairro, sem satellite**, chrome (painel único top-left, busca à direita, bottom sheet no mobile, rodapé slim; sem rail/FAB/zoom no mobile), preview de link (Open Graph + `card.jpg` / `og.html`), botão Compartilhar (card 4:5 + pill do município + Web Share), ordem da legenda de raça parda → branca → preta → indígena → amarela, paleta de renda invertida (pobre vermelho → rico azul), Religião (APOND, `P0410`), Óbitos oculto na UI, painel dev localhost-only.
 - `og.jpg` — crop legado 1200×630; o card do WhatsApp passou a ser `card.jpg`.
 - `card.jpg` — JPEG 1200×630 sem EXIF/ICC para Open Graph / WhatsApp.
 - `og.html` — documento mínimo de Open Graph; o nginx entrega isso ao crawler do WhatsApp.
 - `favicon.svg` / `favicon.ico` / `apple-touch-icon.png` — ícone da aba (cinco pontos nas cores do censo).
-- `docs/fontes.md` — URLs e caveats dos arquivos brutos do IBGE (raça nacional já baixada).
+- `docs/dicionario-microdados.md` — dicionário dos **microdados da amostra** (acesso controlado, 4 registros, 330 variáveis). Não é o agregado por setor do mapa; menor geografia = área de ponderação. CSV irmão: `docs/dicionario-microdados.csv`.
+- `docs/fontes.md` — URLs e caveats dos arquivos brutos do IBGE (agregados por setor + microdados da amostra).
 - `docs/local-setup.md` — como juntar os tiles versionados e servir o mapa.
 - `docs/deploy.md` — CI (`main`/`master` → prod) e o path público `/dotsbr/`.
 - `docs/structure.md` — árvore do repositório.
@@ -88,12 +94,26 @@ Cores atuais dos pontos:
 | parda | `#e41a1c` |
 | indigena | `#984ea3` |
 
+Religião (`P0410`, não reutilizar as cores de raça):
+
+| Categoria | Cor |
+|---|---|
+| relig_catolica | `#2c7fb8` |
+| relig_evangelica | `#e6550d` |
+| relig_sem_religiao | `#737373` |
+| relig_afro | `#756bb1` |
+| relig_espirita | `#31a354` |
+| relig_indigena | `#8c510a` |
+| relig_outras | `#f768a1` |
+| relig_sem_info | `#bdbdbd` |
+
 Sources no mapa:
 
 - `points` — PMTiles `censo2022.pmtiles` (`source-layer: points`), atributo `race`.
-- `income-points` / `deaths-points` — 27 UFs, atributo `cat`; layers `points-income` / `points-deaths` (`censo2022_income.pmtiles` / `censo2022_deaths.pmtiles`).
+- `income-points` / `deaths-points` / `religion-points` — 27 UFs, atributo `cat`; layers `points-income` / `points-deaths` / `points-religion` (`censo2022_income.pmtiles` / `censo2022_deaths.pmtiles` / `censo2022_religion.pmtiles`). `points-deaths` não é adicionado no mapa enquanto Óbitos está oculto.
 - `setores` — `hover.pmtiles` (`source-layer: setores`), zoom 10–12 (overzoom até 14). O GeoJSON nacional não entra no browser (trava no zoom alto).
 - `municipios` — o mesmo `hover.pmtiles` (`source-layer: municipios`), zoom 3–9.
+- `aponds` — o mesmo `hover.pmtiles` (`source-layer: aponds`), zoom 3–12; visível só na view Religião.
 
 Atributos esperados nos GeoJSON de polígonos: `populacao`, `branca`, `preta`, `amarela`, `parda`, `indigena`; municípios também têm `municipio`, `id_municipio`, `sigla_uf`.
 
@@ -103,9 +123,9 @@ Zoom do mapa: `minZoom` 3 no construtor (MapLibre é inclusivo; o primeiro tiles
 
 A escala da legenda (`1 ponto = N pessoas`) em `index.html` **bate com** `makefiles.sh` em 3–14 (4500 / 2000 / 900 / 400 / 150 / 120 / 90 / 70 / 50 / 35 / 25 / 20). Zoom 15 da câmera usa o N do z14 (20). Ao mudar densidade, atualize `makefiles.sh`, a legenda (`peoplePerDot`) e `docs/docs.md` juntos.
 
-Renda nacional usa domicílios/ponto (1500 / 700 / 300 / 130 / 50 / 40 / 30 / 24 / 17 / 12 / 8 / 7) — cerca de 1/3 da escala de raça, para ~72,4M de domicílios renderizarem com a mesma densidade visual que ~202M de pessoas. Cor = faixa da mediana `V06006` (ColorBrewer RdBu invertido: **pobre = vermelho `#b2182b`**, **rico = azul `#2166ac`**; `income_sem_dado` `#777777`); quantidade = responsáveis/domicílios `V06001`. Não interpretar como renda individual ou per capita. Óbitos usa 200 / 100 / 50 / 25 / 12 / 10 / 8 / 6 / 4 / 3 / 2 / 1 e fica mais esparso de propósito (~3,63M de óbitos visíveis, ~1/56 da população); categorias etárias somam sexos e incluem `death_age_suppressed`, porque `X`/`.` não são zeros observados.
+Renda nacional usa domicílios/ponto (1500 / 700 / 300 / 130 / 50 / 40 / 30 / 24 / 17 / 12 / 8 / 7) — cerca de 1/3 da escala de raça, para ~72,4M de domicílios renderizarem com a mesma densidade visual que ~202M de pessoas. Cor = faixa da mediana `V06006` (ColorBrewer RdBu invertido: **pobre = vermelho `#b2182b`**, **rico = azul `#2166ac`**; `income_sem_dado` `#777777`); quantidade = responsáveis/domicílios `V06001`. Não interpretar como renda individual ou per capita. Óbitos usa 200 / 100 / 50 / 25 / 12 / 10 / 8 / 6 / 4 / 3 / 2 / 1 e fica mais esparso de propósito (~3,63M de óbitos visíveis, ~1/56 da população); categorias etárias somam sexos e incluem `death_age_suppressed`, porque `X`/`.` não são zeros observados. Religião usa pessoas de 10+/ponto (3900 / 1750 / 790 / 350 / 130 / 105 / 80 / 60 / 44 / 31 / 22 / 18) — um pouco mais esparsa que raça porque o universo é ~pessoas 10+, não 202 M. A mistura é da APOND em todo zoom; clusters z3–6 não atravessam a borda da APOND.
 
-Tiles gerados em `makefiles.sh` (não o hover): **setor agrupado** (`cluster` / `cluster_*_z3.geojson` … `_z6.geojson`) nos zooms **3–6** (`per_dot` 4500 / 2000 / 900 / 400); **setor censitário** (`census` / `census_tract_*.geojson`) nos zooms **7–14** (`per_dot` 150 / 120 / 90 / 70 / 50 / 35 / 25 / 20). Zoom 15 da câmera só faz overzoom do z=14. Tabela completa em [`docs/docs.md`](docs/docs.md). Hover no mapa é outro corte (município < 10, setor ≥ 10). Rebuild de z3–6: `python3 scripts/build_density_clusters.py UF` então `SKIP_TILE_JOIN=1 ./makefiles.sh UF 3,4,5,6` por UF, e um `tile-join` no fim. Todas as **27 UFs** já têm tiles de cluster nesses zooms.
+Tiles gerados em `makefiles.sh` (não o hover): **setor agrupado** (`cluster` / `cluster_*_z3.geojson` … `_z6.geojson`) nos zooms **3–6** (`per_dot` 4500 / 2000 / 900 / 400); **setor censitário** (`census` / `census_tract_*.geojson`) nos zooms **7–14** (`per_dot` 150 / 120 / 90 / 70 / 50 / 35 / 25 / 20). Zoom 15 da câmera só faz overzoom do z=14. Tabela completa em [`docs/docs.md`](docs/docs.md). Hover no mapa é outro corte (município < 10, setor ≥ 10; na view Religião, APOND em todo zoom). Rebuild de z3–6: `python3 scripts/build_density_clusters.py UF` então `SKIP_TILE_JOIN=1 ./makefiles.sh UF 3,4,5,6` por UF, e um `tile-join` no fim. Todas as **27 UFs** já têm tiles de cluster nesses zooms.
 
 ## Convenções
 
@@ -113,7 +133,7 @@ Tiles gerados em `makefiles.sh` (não o hover): **setor agrupado** (`cluster` / 
 - Comentários no código explicam o **porquê**, não o óbvio.
 - Implemente o pedido por completo; não deixe stubs, TODOs no lugar de código, nem extraia para `js/` sem mover de fato a lógica e atualizar o HTML.
 - Não commitar `data/`, tiles intermediários, `.env` ou tokens. O token Mapbox hoje está inline em `index.html`; não espalhe em mais lugares e não o coloque em docs públicos novos.
-- UI e copy do mapa em português (Brasil), jornalística: sem jargão ("mediana", "SM", "setor censitário") e sem "(IBGE)" nos textos correntes — a fonte oficial fica só nos créditos. O nome do produto é **dotsbr**; o `h1` do painel e o título do sheet mobile ganham o sufixo da view ativa (**por Raça / por Renda**, reescrito no switch; **por Mortes** quando a view for reexibida), e o `<title>` da página fica só com o nome do produto. O explainer no painel é **Cada ponto é um grupo de pessoas. A cor mostra a raça que elas declararam no Censo de 2022. Quanto mais você aproxima o mapa, menos pessoas cada ponto representa.** (outras views reescrevem a explicação e o sufixo, nunca o nome antes do "por"). Nomes de categoria racial no código ficam sem acento (`indigena`, `preta`) para bater com os tiles.
+- UI e copy do mapa em português (Brasil), jornalística: sem jargão ("mediana", "SM", "setor censitário", "área de ponderação") e sem "(IBGE)" nos textos correntes — a fonte oficial fica só nos créditos. O nome do produto é **dotsbr**; o `h1` do painel e o título do sheet mobile ganham o sufixo da view ativa (**por Raça / por Renda / por Religião**, reescrito no switch; **por Mortes** quando a view for reexibida), e o `<title>` da página fica só com o nome do produto. O explainer no painel é **Cada ponto é um grupo de pessoas. A cor mostra a raça que elas declararam no Censo de 2022. Quanto mais você aproxima o mapa, menos pessoas cada ponto representa.** (Religião: *estimada para um conjunto de vizinhanças*; outras views reescrevem a explicação e o sufixo, nunca o nome antes do "por"). Nomes de categoria racial no código ficam sem acento (`indigena`, `preta`) para bater com os tiles. Religião usa `relig_*` e `P0410`, não as 33 denominações de `P0411`.
 - Preferir `uv` para Python. Não adicionar dependências sem necessidade.
 - Mudanças de UI (layout, estado, rotas, dados renderizados) precisam ser verificadas no browser, não só por leitura de código.
 
@@ -123,3 +143,4 @@ Tiles gerados em `makefiles.sh` (não o hover): **setor agrupado** (`cluster` / 
 - Não tratar `docs/docs.md` e `TODO` como source of truth da densidade — o código em `makefiles.sh` e `index.html` é o que roda.
 - Pontos cobrem as 27 UFs. A busca é nacional (Brasil, `countries: 'br'`, bbox alinhado à câmera `[-74, -34, -32, 6]`); CEP via BrasilAPI não filtra por UF. Hover no browser é `data/tiles/hover.pmtiles`, não o GeoJSON concatenado.
 - Não inventar novas categorias raciais além das cinco do IBGE usadas aqui.
+- Não commitar `*_controlado.csv` nem fingir resolução de setor na view Religião (mistura da APOND; hover = `aponds`).

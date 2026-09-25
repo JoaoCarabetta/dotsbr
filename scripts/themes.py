@@ -53,6 +53,30 @@ DEATH_KEYS = (
     "death_60_plus",
     "death_age_suppressed",
 )
+# Official P0410 groups (sample, ages 10+). 8 and 9 collapse so the
+# legend does not treat "não sabe" as a faith.
+RELIGION_KEYS = (
+    "relig_catolica",
+    "relig_evangelica",
+    "relig_espirita",
+    "relig_afro",
+    "relig_indigena",
+    "relig_sem_religiao",
+    "relig_outras",
+    "relig_sem_info",
+)
+# P0410 codes → map keys. Blank is under-10, not "sem religião".
+P0410_TO_KEY = {
+    "1": "relig_catolica",
+    "2": "relig_evangelica",
+    "3": "relig_espirita",
+    "4": "relig_afro",
+    "5": "relig_indigena",
+    "6": "relig_outras",
+    "7": "relig_sem_religiao",
+    "8": "relig_sem_info",
+    "9": "relig_sem_info",
+}
 
 
 @dataclass(frozen=True)
@@ -163,6 +187,14 @@ def extract_deaths(row: dict[str, str], fields: dict[str, str]) -> dict[str, int
     return {**counts, "obitos": visible_total}
 
 
+def extract_religion(
+    row: dict[str, str], fields: dict[str, str]
+) -> dict[str, int | float]:
+    """Read a already-allocated setor row (not raw microdata)."""
+    counts = {key: int(num(_field(row, fields, key))) for key in RELIGION_KEYS}
+    return {**counts, "pessoas_10": sum(counts.values())}
+
+
 # National totals: ~72.4M households and ~3.63M visible deaths vs ~202M people.
 # Income stays ~1/3 of the race schedule so switching views keeps similar
 # visual density (z14 is 7, not 6, so ~10.3M dots instead of 12M).
@@ -208,6 +240,21 @@ THEMES = {
         key_field="CD_SETOR",
         per_dot=(200, 100, 50, 25, 12, 10, 8, 6, 4, 3, 2, 1),
         extract=extract_deaths,
+    ),
+    # Sample religion is valid only at the weighting area. The CSV written
+    # by build_religion_apond.py already holds APOND-level mix allocated
+    # onto setores (dasymetric). per_dot is a touch sparser than race
+    # because the universe is people aged 10+, ~177M not ~202M.
+    "religion": Theme(
+        id="religion",
+        categories=RELIGION_KEYS,
+        total_field="pessoas_10",
+        source_path=OUTPUT_ROOT / "religion" / "apond_religion.csv",
+        source_url=None,
+        source_zip=None,
+        key_field="id_setor_censitario",
+        per_dot=(3900, 1750, 790, 350, 130, 105, 80, 60, 44, 31, 22, 18),
+        extract=extract_religion,
     ),
 }
 

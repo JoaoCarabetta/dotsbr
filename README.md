@@ -1,10 +1,10 @@
 # dotmap
 
-Mapa de densidade de pontos do Censo 2022 / IBGE. A UI mostra **Raça** e **Renda** (27 UFs). Óbitos está no pipeline/tiles mas oculto no seletor até a view ficar pronta. Frontend MapLibre GL JS; tiles em PMTiles servidos da mesma origem (HTTP Range).
+Mapa de densidade de pontos do Censo 2022 / IBGE. A UI mostra **Raça**, **Renda** e **Religião** (27 UFs). Religião vem da amostra (área de ponderação), não do agregado por setor. Óbitos está no pipeline/tiles mas oculto no seletor até a view ficar pronta. Frontend MapLibre GL JS; tiles em PMTiles servidos da mesma origem (HTTP Range).
 
 Ao vivo: [https://carabetta.xyz/dotsbr/](https://carabetta.xyz/dotsbr/). Código: [github.com/JoaoCarabetta/dotsbr](https://github.com/JoaoCarabetta/dotsbr). `main` e `master` são produção ([docs/deploy.md](docs/deploy.md)).
 
-Guia completo: [docs/local-setup.md](docs/local-setup.md).
+Guia completo: [docs/local-setup.md](docs/local-setup.md). Fontes e caveats: [docs/fontes.md](docs/fontes.md). Microdados da amostra (acesso controlado): [docs/dicionario-microdados.md](docs/dicionario-microdados.md). Exemplo de vídeo em Remotion: [docs/video.md](docs/video.md) (`cd video && npx remotion studio`).
 
 ## Run locally (tiles already in the repo)
 
@@ -19,6 +19,7 @@ mkdir -p data/tiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022.pmtiles tiles/*/*/tiles.mbtiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_income.pmtiles tiles/income/*/*/tiles.mbtiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_deaths.pmtiles tiles/deaths/*/*/tiles.mbtiles
+tile-join -f --no-tile-size-limit -o data/tiles/censo2022_religion.pmtiles tiles/religion/*/*/tiles.mbtiles
 
 python3 scripts/serve.py
 ```
@@ -29,7 +30,7 @@ Open `http://localhost:8000`. Tiles come from `/data/tiles/censo2022.pmtiles` on
 
 Without restoring extra files from elsewhere:
 
-- **Works:** light-v10 basemap (no labels, no satellite) + national **Raça** dots (zooms 3–14; 3–6 clustered setor). **Renda** needs a local `tile-join` of `tiles/income/` (theme MBTiles are built locally, not versioned here). **Óbitos** is hidden in the UI.
+- **Works:** light-v10 basemap (no labels, no satellite) + national **Raça** dots (zooms 3–14; 3–6 clustered setor). **Renda** and **Religião** need a local `tile-join` of `tiles/income/` / `tiles/religion/` (theme MBTiles are built locally, not versioned here). **Óbitos** is hidden in the UI.
 - **404:** hover tiles (`data/tiles/hover.pmtiles`) until `python3 scripts/ibge_uf.py tiles`
 
 ## Create the dataset from scratch
@@ -57,4 +58,16 @@ printf '%s\n' AC AL AM AP BA CE DF ES GO MA MG MS MT PA PB PE PI PR RJ RN RO RR 
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_income.pmtiles tiles/income/*/*/tiles.mbtiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_deaths.pmtiles tiles/deaths/*/*/tiles.mbtiles
 python3 scripts/ibge_uf.py
+```
+
+Religion (controlled sample in Downloads; never commit those CSVs):
+
+```sh
+python3 scripts/build_religion_apond.py expand
+./scripts/build_theme_uf.sh RR religion
+printf '%s\n' AC AL AM AP BA CE DF ES GO MA MG MS MT PA PB PE PI PR RJ RN RO RR RS SC SE SP TO \
+  | xargs -P 2 -n 1 -I{} ./scripts/build_theme_uf.sh {} religion
+tile-join -f --no-tile-size-limit -o data/tiles/censo2022_religion.pmtiles tiles/religion/*/*/tiles.mbtiles
+python3 scripts/build_religion_apond.py hover
+python3 scripts/ibge_uf.py aponds
 ```

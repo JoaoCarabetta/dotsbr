@@ -11,7 +11,7 @@ Nginx and the rest of carabetta.xyz live in the sibling `carabetta.xyz` repo. Th
 | `.github/workflows/deploy.yml` | this repo | `index.html` + `og.html` (WhatsApp crawler page) + `card.jpg` / `og.jpg` + favicons |
 | `.github/workflows/deploy.yml` | `carabetta.xyz` | site HTML + nginx; **not** PMTiles |
 
-The four archives (`censo2022.pmtiles`, `censo2022_income.pmtiles`, `censo2022_deaths.pmtiles`, `hover.pmtiles`) stay on the VPS at `/var/www/carabetta.xyz/dotsbr/data/tiles/`. They are gitignored (~700MB). Upload them from a machine that already has `data/tiles/`:
+The archives (`censo2022.pmtiles`, `censo2022_income.pmtiles`, `censo2022_deaths.pmtiles`, `censo2022_religion.pmtiles`, `hover.pmtiles`) stay on the VPS at `/var/www/carabetta.xyz/dotsbr/data/tiles/`. They are gitignored. Upload them from a machine that already has `data/tiles/`:
 
 ```sh
 cp deploy.env.example deploy.env
@@ -36,3 +36,7 @@ Both repos need:
 ## Nginx
 
 `/dotsbr/` is static files. `.pmtiles` must be served with `Accept-Ranges: bytes` and **without** gziping the archive body — otherwise Range `206` breaks and the map is blank. Config lives in `carabetta.xyz/nginx.carabetta.xyz.conf`.
+
+The site CSP must allow MapLibre 4.7 blob workers (`worker-src 'self' blob:`, `child-src 'self' blob:`, `script-src`/`img-src` include `blob:`). Without that, the style JSON loads, tiles stay stuck in `loading`, `map.on('load')` never fires, and production is a blank canvas. CEP search also needs `connect-src https://brasilapi.com.br`.
+
+Changing only nginx `add_header` does not bump `Last-Modified` on `index.html`. Cloudflare then answers `304` and keeps the old CSP in the cached HTML response. After a CSP change, `touch` the live `index.html` (or purge the `/dotsbr/` HTML at the edge).

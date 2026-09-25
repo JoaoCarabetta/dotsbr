@@ -19,9 +19,24 @@ class RangeRequestHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
     def end_headers(self):
+        # Remotion Studio (:3000) Range-GETs the archive from this origin.
+        # Same-origin map page ignores these headers.
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Range")
+        self.send_header(
+            "Access-Control-Expose-Headers",
+            "Accept-Ranges, Content-Range, Content-Length, ETag",
+        )
         if self.path.split("?", 1)[0].endswith(".pmtiles"):
             self.send_header("Accept-Ranges", "bytes")
         super().end_headers()
+
+    def do_OPTIONS(self):
+        # Range is not a CORS-safelisted request header, so the Studio
+        # preview sends a preflight before the first tile fetch.
+        self.send_response(204)
+        self.end_headers()
 
     def send_head(self):
         path = self.translate_path(self.path)

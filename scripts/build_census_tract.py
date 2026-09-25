@@ -137,6 +137,9 @@ def mapshaper_join(uf: str, shp, theme: Theme) -> None:
     ]
     if theme.id == "income":
         fields.extend(["renda_media", "renda_mediana"])
+    if theme.id == "religion":
+        # id_apond stays on the setor so hover can dissolve to weighting areas.
+        fields.extend(["id_apond", "unstable_cats"])
     # Rename first so the join key matches the counts CSV. Drop bulky IBGE
     # columns we do not render; keep municipio for a future tooltip label.
     run_mapshaper(
@@ -147,7 +150,7 @@ def mapshaper_join(uf: str, shp, theme: Theme) -> None:
             "-join",
             str(counts_csv),
             "keys=id_setor_censitario,id_setor_censitario",
-            "string-fields=id_setor_censitario,id_municipio",
+            "string-fields=id_setor_censitario,id_municipio,id_apond,unstable_cats",
             "-filter-fields",
             ",".join(fields),
             "-o",
@@ -156,18 +159,26 @@ def mapshaper_join(uf: str, shp, theme: Theme) -> None:
         ]
     )
     print(f"wrote {out_path}")
-    if theme.id != "race":
+    # Religion hover is the APOND polygon, not the setor. Joining the mix
+    # onto race hover would invite showing sample religion at setor resolution.
+    if theme.id not in ("race", "religion"):
         enrich_race_hover(uf, counts_csv)
 
 
 def main(argv: list[str] | None = None) -> None:
     args = argv if argv is not None else sys.argv[1:]
     if not 1 <= len(args) <= 2:
-        raise SystemExit(f"Usage: {sys.argv[0]} <UF> [race|income|deaths]")
+        raise SystemExit(f"Usage: {sys.argv[0]} <UF> [race|income|deaths|religion]")
     uf = parse_uf(args[0])
     theme = get_theme(args[1] if len(args) > 1 else None)
-    ensure_theme_source(theme)
-    write_setor_counts(uf, theme)
+    if theme.id == "religion":
+        # Religion counts are expanded from the sample, not a setor CSV.
+        from build_religion_apond import write_setor_counts as write_religion_counts
+
+        write_religion_counts(uf)
+    else:
+        ensure_theme_source(theme)
+        write_setor_counts(uf, theme)
     shp = ensure_malha(uf)
     mapshaper_join(uf, shp, theme)
     # Theme builds enrich the race geometry; rebuild the expensive national

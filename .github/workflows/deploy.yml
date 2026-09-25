@@ -56,7 +56,7 @@ jobs:
       - name: Smoke-check production
         run: |
           set -euo pipefail
-          for path in /dotsbr/ /dotsbr/og.html /dotsbr/card.jpg /dotsbr/og.jpg /dotsbr/favicon.ico /dotsbr/favicon.svg /dotsbr/apple-touch-icon.png; do
+          for path in /dotsbr/ /dotsbr/og.html /dotsbr/card.jpg /dotsbr/og.jpg /dotsbr/favicon.ico /dotsbr/favicon.svg /dotsbr/apple-touch-icon.png /dotsbr.md; do
             code="$(curl -sI -o /tmp/dotsbr.hdr -w '%{http_code}' "https://carabetta.xyz${path}")"
             echo "GET ${path} → ${code}"
             cat /tmp/dotsbr.hdr

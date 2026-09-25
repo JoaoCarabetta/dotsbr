@@ -1,10 +1,10 @@
-Agent instructions for this repo live in [`AGENTS.md`](../AGENTS.md). Project layout is in [`structure.md`](structure.md). How to serve the map from the versioned per-UF MBTiles (joined to PMTiles) is in [`local-setup.md`](local-setup.md). The public page is [https://carabetta.xyz/dotsbr/](https://carabetta.xyz/dotsbr/). How that URL is published (`main`/`master` → prod) is in [`deploy.md`](deploy.md). Product analytics (Umami, not Google Analytics) are in [`user-analytics.md`](user-analytics.md).
+Agent instructions for this repo live in [`AGENTS.md`](../AGENTS.md). Project layout is in [`structure.md`](structure.md). How to serve the map from the versioned per-UF MBTiles (joined to PMTiles) is in [`local-setup.md`](local-setup.md). The public page is [https://carabetta.xyz/dotsbr/](https://carabetta.xyz/dotsbr/). How that URL is published (`main`/`master` → prod) is in [`deploy.md`](deploy.md). Product analytics (Umami, not Google Analytics) are in [`user-analytics.md`](user-analytics.md). The map uses universe-by-setor aggregates ([`fontes.md`](fontes.md)); the long-form **sample** microdata (person/household, weighting area only) is catalogued in [`dicionario-microdados.md`](dicionario-microdados.md).
 
 # Zoom Levels and Dot Density Configuration
 
 This document describes the relationship between zoom levels and dot density in the map visualization.
 
-The UI switches between **Raça** and **Renda**, both with 27-UF coverage. Renda dots represent occupied permanent private households and are colored by the setor median income of responsible persons with income.
+The UI switches between **Raça**, **Renda**, and **Religião**, all with 27-UF coverage. Renda dots represent occupied permanent private households and are colored by the setor median income of responsible persons with income. Religião is sample-only: the mix is estimated at the weighting area (APOND) and painted dasymetrically onto the same setor/cluster polygons — zoom changes `1 ponto = N`, not the geography of the color.
 
 **Óbitos is built but hidden from the UI for now**: the tiles (`tiles/deaths/`, `censo2022_deaths.pmtiles`), the makefiles theme, and the `deaths` entry in `VIEW_CONFIGS` all stay, but the switcher buttons were removed and `HIDDEN_VIEWS` in `index.html` makes `setView('deaths')` a no-op (persisted `dotmap-view: deaths` falls back to race on load). The UI label is **Mortes** (not “Óbitos”). Dots represent deaths reported for January 2019–July 2022, colored by age at death; sex is summed, not shown. To un-hide: restore the button in both switchers and drop `deaths` from `HIDDEN_VIEWS`.
 
@@ -34,26 +34,28 @@ Source of truth for **how tiles are generated** is [`makefiles.sh`](../makefiles
 
 These are independent units and must not reuse the race legend. Income (~72.4M households) stays about one third of the race schedule so the two views have similar visual density. Deaths (~3.63M visible) stay sparser on purpose — matching race 1:1 would make mortality look as populated as the census.
 
-| Zoom | Renda: domicílios/ponto | Óbitos/ponto |
-|---|---:|---:|
-| 3 | 1 500 | 200 |
-| 4 | 700 | 100 |
-| 5 | 300 | 50 |
-| 6 | 130 | 25 |
-| 7 | 50 | 12 |
-| 8 | 40 | 10 |
-| 9 | 30 | 8 |
-| 10 | 24 | 6 |
-| 11 | 17 | 4 |
-| 12 | 12 | 3 |
-| 13 | 8 | 2 |
-| 14–15 | 7 | 1 |
+| Zoom | Renda: domicílios/ponto | Óbitos/ponto | Religião: pessoas 10+/ponto |
+|---|---:|---:|---:|
+| 3 | 1 500 | 200 | 3 900 |
+| 4 | 700 | 100 | 1 750 |
+| 5 | 300 | 50 | 790 |
+| 6 | 130 | 25 | 350 |
+| 7 | 50 | 12 | 130 |
+| 8 | 40 | 10 | 105 |
+| 9 | 30 | 8 | 80 |
+| 10 | 24 | 6 | 60 |
+| 11 | 17 | 4 | 44 |
+| 12 | 12 | 3 | 31 |
+| 13 | 8 | 2 | 22 |
+| 14–15 | 7 | 1 | 18 |
 
 Income categories use `V06006` divided by the 2022 minimum wage (R$ 1,212): up to 1, 1–2, 2–3, 3–5, 5–10, and over 10 minimum wages, plus unavailable. All household dots in a setor share its median-income category; the map does not infer household-level income. The ColorBrewer RdBu ramp is inverted: **poor = red, rich = blue** (`#b2182b` → `#2166ac`; `income_sem_dado` stays `#777777`).
 
 Mortality categories are `0–14`, `15–29`, `30–59`, `60+`, and `idade suprimida`. The last category is required because IBGE suppresses detailed-age cells much more often than sex totals. Nationally, about 3.63M deaths have a visible sex total and 1.91M have a visible detailed age.
 
-Hover on the map is a different cutoff: município polygons below zoom 10, setor from 10. Do not read hover as the tile-generation unit.
+Religião is **not** on the basic questionnaire. The mix comes from the controlled sample (`P0410` × weight `P0111`, people aged 10+). Official groups: Católica, Evangélicas, Espírita, Umbanda e Candomblé, Tradições indígenas, Outras, Sem religião; codes 8+9 collapse to Sem informação. Do **not** put `P0411` denominations on the legend. Cells with weighted total &lt; 400 or unweighted n &lt; 30 are not painted; hover labels them **estimativa instável**. Clusters at z3–6 never dissolve across an APOND border. Keep imputed rows (`MP0410 = 1`).
+
+Hover on the map is a different cutoff: município polygons below zoom 10, setor from 10 — except in **Religião**, which always queries the `aponds` layer (weighting area at every zoom). The dissolve drops malha cells with no `id_apond` (water and other leftover mesh) so the sea is not a hover hit. Do not read hover as the tile-generation unit.
 
 `per_dot` steps ~2.25× into z7 (4 500 / 2 000 / 900 / 400 / 150). Cluster polygons come from [`scripts/build_density_clusters.py`](../scripts/build_density_clusters.py): adjacent setores of the same density class (urban/povoado vs zona rural) merge until each cluster has about `per_dot` people, so dots stay on settlements instead of filling the município. All **27 UFs** have clustered tiles at zooms 3–6.
 
@@ -77,8 +79,8 @@ Hover on the map is a different cutoff: município polygons below zoom 10, setor
 
 - **Clustered setor (zoom 3–6):** Adjacent census tracts of the same density class are dissolved until each polygon has about `per_dot` people (4 500 / 2 000 / 900 / 400). Dots stay on the urban/povoado footprint instead of filling the município. All 27 UFs use this level.
 - **Census tract (zoom 7–14):** One polygon per setor. z7 is 150 people/dot, so 6→7 is a ~2.7× refinement of the same settlement pattern.
-- Recorte atual dos pontos: **27 UFs** (cobertura nacional). Hover de município/setor vem de `data/tiles/hover.pmtiles` (não do GeoJSON concatenado): o `census_tract.geojson` nacional (~248 MB) trava o mapa no zoom alto.
-- MapLibre treats `minZoom` as inclusive, so `index.html` sets it to **3** (first point tileset). Camera `maxZoom` is **15** so the local Rio shortcut can overzoom; the vector source still advertises `minzoom: 3` / `maxzoom: 14` (no z=15 PBF). Archives are same-origin PMTiles (`data/tiles/*.pmtiles`); do not gzip them.
+- Recorte atual dos pontos: **27 UFs** (cobertura nacional). Hover de município/setor (e `aponds` na view Religião) vem de `data/tiles/hover.pmtiles` (não do GeoJSON concatenado): o `census_tract.geojson` nacional (~248 MB) trava o mapa no zoom alto.
+- MapLibre treats `minZoom` as inclusive, so `index.html` sets it to **3** (first point tileset). Camera `maxZoom` is **15** so the local Rio shortcut can overzoom; the vector source still advertises `minzoom: 3` / `maxzoom: 14` (no z=15 PBF). Archives are same-origin PMTiles (`data/tiles/*.pmtiles`); do not gzip them. Production CSP must allow MapLibre blob workers (`worker-src 'self' blob:`); see [`deploy.md`](deploy.md).
 - The map **opens on Brazil, not Rio**: constructor fallback `[-51.9, -14.2]` at zoom 3.5, then a camera calculated from `[[-74, -34], [-32, 6]]`. When that whole-country fit would fall below the first point tiles on a narrow portrait screen, startup keeps the national center and clamps to zoom 3 so dots render instead of showing an empty overview. Point tiles cover all 27 UFs. A `tile-join` without `--no-tile-size-limit` still drops the SP+MG overlap at z7 (XYZ `7/47/72`, ~508 KB vs the 500 KB default) and leaves São Paulo blank even though `tiles/SP/` is complete.
 - Circle radius is a linear interpolate on stops 3 / 7 / 12 / 13 (`0.96` → `0.96` → `1.36` → `2.16` px): ×1.2 everywhere, then an extra ×1.5 from zoom 13 (held through 15). The z12 stop keeps the 50% kick from ramping in at 12. People-per-dot is unchanged.
 
@@ -142,6 +144,7 @@ Do not add categories beyond these five IBGE keys (`branca`, `preta`, `amarela`,
 - A `Set` of active races
 - Separate handlers on `.race-row-toggle` and `.solo-button`
 - `syncFilterUi()` keeps the legend rows in the same Set
+- Viewport `%` is a separate pass (`updateViewportShares`): unique hover features in the canvas (`municipios-fill` below zoom 10, `setores-fill` from 10, `aponds-fill` in Religião). Raça and Religião sum official category fields; Renda classifies each unit by its `renda_mediana` (same 2022 SM bins as `themes.py`) and weights by `domicilios`, falling back to counting painted dots if those fields are missing. Integers use the largest-remainder method so they add to 100. Updates on `moveend` and hover-source `sourcedata`, not on every hover paint.
 
 # Basemap
 
@@ -171,6 +174,19 @@ Income (ColorBrewer RdBu inverted — low = red, high = blue):
 | `income_mais_10sm` | `#2166ac` | darkest blue — mais de 10 salários mínimos |
 | `income_sem_dado` | `#777777` | sem informação |
 
+Religion (new palette — do not reuse the five race hues):
+
+| Key | Hex | Label |
+|---|---|---|
+| `relig_catolica` | `#2c7fb8` | Católica |
+| `relig_evangelica` | `#e6550d` | Evangélicas |
+| `relig_sem_religiao` | `#737373` | Sem religião |
+| `relig_afro` | `#756bb1` | Umbanda e Candomblé |
+| `relig_espirita` | `#31a354` | Espírita |
+| `relig_indigena` | `#8c510a` | Tradições indígenas |
+| `relig_outras` | `#f768a1` | Outras |
+| `relig_sem_info` | `#bdbdbd` | Sem informação |
+
 This mapping is the product default (`circle-color` match + legend swatches) and HUD **Atual**. Production users get it with no HUD. Do not restore the old red/gold/mint set (`#fb3640` / `#d4b000` / `#89ffa7` / `#3899c9` / `#e8800c`) or the previous income ramp that painted poor blue and rich red. The single panel, the search field, and the slim footer keep light chrome (white surfaces, dark text) on top of the light map.
 
 # Map chrome
@@ -181,11 +197,11 @@ The map is full-bleed (`#map` is `100vw` / `100vh`). There is **no** fixed heade
 
 White rounded card, top-left, story-first — the mobile sheet's reading order applied to desktop:
 
-1. **h1 with the active lens**: `dotsbr por Raça/Renda` (`#intro-title`, rewritten live by `setView`, same "por <label>" pattern as the mobile sheet title; Óbitos would follow the same pattern when un-hidden). A **Compartilhar** button sits on the same row (`#desk-share`) — see [Share button](#share-button).
+1. **h1 with the active lens**: `dotsbr por Raça/Renda/Religião` (`#intro-title`, rewritten live by `setView`, same "por <label>" pattern as the mobile sheet title; Óbitos would follow the same pattern when un-hidden). A **Compartilhar** button sits on the same row (`#desk-share`) — see [Share button](#share-button).
 2. **Hero scale line** (`#dot-scale`, ~15px semibold): `1 ponto = N unidades`, updated on zoom and prefixed with filter state exactly like the sheet headline (`Só Parda · …` when soloed, `Mostrando k de n grupos · …` for partial sets). It was an 11px footnote in the old legend card; it is the number that keeps the map honest, so it leads.
-3. **Raça / Renda** switcher (view stored as `dotmap-view`; switching does not move the camera; Óbitos hidden — see the views note at the top).
+3. **Raça / Renda / Religião** switcher (view stored as `dotmap-view`; switching does not move the camera; Óbitos hidden — see the views note at the top).
 4. Explainer.
-5. **Legend rows** (toggle + solo, race order parda → branca → preta → indígena → amarela). On short viewports (e.g. 1366×768) **only this list scrolls** (`overflow-y: auto` + flex `min-height: 0`), so the panel never overflows the viewport.
+5. **Legend rows** (toggle + solo, race order parda → branca → preta → indígena → amarela). Each row shows the group's **share of the visible frame** (`43%`), recomputed from hover polygons when the camera stops — not from a dot sample, and not from the active filter (hiding Parda does not make Branca 100%). A place that only peeks into the frame is counted in full. On short viewports (e.g. 1366×768) **only this list scrolls** (`overflow-y: auto` + flex `min-height: 0`), so the panel never overflows the viewport.
 6. **Docked stats slot** (`#panel-stats`) + a quiet hint (`Clique em uma área do mapa para ver os números aqui`) — see hover/click below.
 
 Search is **not** inside the panel: the geocoder floats as a white pill **immediately to the right of the panel, top-aligned** (`#desk-search`, anchored to the stack with `left: calc(100% + 12px)` so it tracks the card width). Suggestions drop over the map, never clipped by the card.
@@ -194,9 +210,9 @@ The page `<title>` stays the plain **dotsbr** (tab labels should not churn on vi
 
 **Cada ponto é um grupo de pessoas. A cor mostra a raça que elas declararam no Censo de 2022. Quanto mais você aproxima o mapa, menos pessoas cada ponto representa.**
 
-Renda: **Cada ponto é um grupo de domicílios. A cor mostra a renda típica de quem é responsável pelo domicílio em cada vizinhança, medida em salários mínimos (Censo de 2022). Quanto mais você aproxima o mapa, menos domicílios cada ponto representa.** Mortes (hidden): **Cada ponto é um grupo de pessoas que morreram entre janeiro de 2019 e julho de 2022. A cor mostra a idade com que morreram (Censo de 2022). Quanto mais você aproxima o mapa, menos pessoas cada ponto representa.**
+Renda: **Cada ponto é um grupo de domicílios. A cor mostra a renda típica de quem é responsável pelo domicílio em cada vizinhança, medida em salários mínimos (Censo de 2022). Quanto mais você aproxima o mapa, menos domicílios cada ponto representa.** Religião: **Cada ponto é um grupo de pessoas com 10 anos ou mais. A cor é a religião declarada no Censo de 2022, estimada para um conjunto de vizinhanças (não para cada quarteirão). Aproximar o mapa muda só quantas pessoas cada ponto representa, não o recorte da cor.** Mortes (hidden): **Cada ponto é um grupo de pessoas que morreram entre janeiro de 2019 e julho de 2022. A cor mostra a idade com que morreram (Censo de 2022). Quanto mais você aproxima o mapa, menos pessoas cada ponto representa.**
 
-Body copy never says “(IBGE)” or “Censo Demográfico 2022” — those stay in the footer/sheet credits. Do not say “um ponto por pessoa”: one dot is N units and N changes with zoom. Do not restore the old h1 “Distribuição Racial no Brasil” (too close to Pata’s 2015 *Mapa Racial do Brasil*) or the previous product name “Onde o Brasil mora”. The income and mortality views rewrite the explanation and swap the h1's `por <label>` suffix (Mortes when that view is un-hidden); the product name before “por” never changes.
+Body copy never says “(IBGE)” or “Censo Demográfico 2022” — those stay in the footer/sheet credits. Do not say “um ponto por pessoa”: one dot is N units and N changes with zoom. Do not restore the old h1 “Distribuição Racial no Brasil” (too close to Pata’s 2015 *Mapa Racial do Brasil*) or the previous product name “Onde o Brasil mora”. The income, religion, and mortality views rewrite the explanation and swap the h1's `por <label>` suffix (Mortes when that view is un-hidden); the product name before “por” never changes.
 
 ## Link previews (WhatsApp / iMessage)
 
@@ -231,8 +247,8 @@ Tap composes a **4:5** JPEG (up to 2160px wide, quality 0.92) in Canvas 2D — n
 
 | Band | Content |
 |---|---|
-| Map | `map.getCanvas()` of the current camera (filters and view included). Needs `preserveDrawingBuffer: true` or the frame is already cleared. A white pill at the lower-left names the place: **Brasil** below zoom 6 (country frame — the geographic center would otherwise be a random cerrado município); at 6+ `municipio · UF` from `queryRenderedFeatures` at the camera center (`municipios-fill` z3–9, `setores-fill` z≥10). No hit / no `municipio` field: no pill. Never “Setor Censitário”. |
-| Caption | `dotsbr por <view>`, the same `formatDotScale()` string as the hero line (including `Só` / `Mostrando N de M grupos`), swatches for **active** categories only, the share hook, `carabetta.xyz/dotsbr` |
+| Map | `map.getCanvas()` of the current camera (filters and view included). Needs `preserveDrawingBuffer: true` or the frame is already cleared. A white pill at the lower-left names the place: **Brasil** below zoom 6 (country frame — the geographic center would otherwise be a random cerrado município); at 6+ `municipio · UF` from `queryRenderedFeatures` at the camera center (`municipios-fill` z3–9, `setores-fill` z≥10; Religião uses `aponds-fill`). No hit / no `municipio` field: no pill. Never “Setor Censitário”. |
+| Caption | `dotsbr por <view>`, the same `formatDotScale()` string as the hero line (including `Só` / `Mostrando N de M grupos`), swatches for **active** categories with the current viewport `%` when it is ready, the share hook, `carabetta.xyz/dotsbr` |
 
 Município/setor **numbers** stay off the card (the pill is a name only). The live map shows city and bairro labels from the basemap; the pill is still drawn on the JPEG. `html2canvas` is not used (WebGL + live chrome would fail or look messy).
 
@@ -244,7 +260,7 @@ Do not restore a standalone search chrome.
 
 ## Hover, click, and the stats surfaces
 
-Hover numbers live in the Mapbox **popup on the map** following the cursor (município below zoom 10, setor from zoom 10 — titled **Vizinhança (recorte do Censo)**). Raça shows shares and population; Renda shows represented households and **Renda do domicílio** (the setor median; mean is omitted so the two figures cannot be confused); Mortes (hidden) would show counts/shares by age with no sex breakdown. The popup sits at `z-index: 115` — above the fixed panel (114) — so hovering near the left edge is not hidden behind it.
+The legend `%` is the mix of **every** hover unit touching the camera (see the filter section). Hover numbers live in the Mapbox **popup on the map** following the cursor (município below zoom 10, setor from zoom 10 — titled **Vizinhança (recorte do Censo)**). Religião always reads the weighting-area layer (`aponds`), never setor or município, and shows the weighted `P0410` breakdown plus **estimativa instável** on thin cells. Raça shows shares and population; Renda shows represented households and **Renda do domicílio** (the setor median; mean is omitted so the two figures cannot be confused); Mortes (hidden) would show counts/shares by age with no sex breakdown. The popup sits at `z-index: 115` — above the fixed panel (114) — so hovering near the left edge is not hidden behind it.
 
 A **click** on a polygon (desktop) additionally **docks the same numbers into the panel's bottom slot** (`#panel-stats`), mirroring the mobile tap dock: the reading stays put for comparison while the mouse keeps hovering elsewhere. An empty-map click, the **✕**, or a view switch dismisses it; it deliberately survives `clearHoverState` (mouseout/empty hover), pans, and zooms. All three surfaces (popup, panel slot, mobile dock) are fed by one query, `detailsAtPoint()`.
 
@@ -262,8 +278,8 @@ The sheet snaps between three `translateY` offsets, recomputed from live heights
 
 | State | What shows | How you get there |
 |---|---|---|
-| **peek** | drag handle + **dotsbr por Raça/Renda** (title carries the active lens, updated live on view switch; label matches the switcher) + live `1 ponto = N unidades` line + **Compartilhar** | drag down, tap header, or tap the map while open |
-| **half** (~52vh, ≤400px) | + Raça/Renda switcher, explainer | drag, or tap header from peek |
+| **peek** | drag handle + **dotsbr por Raça/Renda/Religião** (title carries the active lens, updated live on view switch; label matches the switcher) + live `1 ponto = N unidades` line + **Compartilhar** | drag down, tap header, or tap the map while open |
+| **half** (~52vh, ≤400px) | + Raça/Renda/Religião switcher, explainer | drag, or tap header from peek |
 | **full** (92dvh) | + 44px legend rows with **S** solo buttons, **credits** | drag up |
 
 - **First visit opens at half** so the story (title, scale, lens, explainer) shows once; afterwards the last snap state wins for the session (`sessionStorage` key `dotmap-sheet-state`).
@@ -273,7 +289,7 @@ The sheet snaps between three `translateY` offsets, recomputed from live heights
 
 ### Chip rail (`#chip-rail`, peek state only)
 
-The always-visible legend while exploring: one pill chip per group of the active view (swatch + name, ≥44px tall, horizontal scroll for Renda's 7). Renda chips use short labels (`Até 1`, `1 a 2`, … `10+`, `Sem info`); the full legend and the explainer still say “salário mínimo”. **Tap toggles** the group; **long-press (500ms) solos** it (context menu suppressed; a moving finger cancels the press so rail scrolling works). The rail hides when the sheet expands (the full legend list takes over) or while a stats card is docked. The sheet headline reports filters so the map never lies silently: `Só Parda · …` when soloed, `Mostrando k de n grupos · …` for partial sets.
+The always-visible legend while exploring: one pill chip per group of the active view (swatch + name + viewport `%`, ≥44px tall, horizontal scroll for Renda's 7 and Religião's 8). Renda chips use short labels (`Até 1`, `1 a 2`, … `10+`, `Sem info`); Religião chips shorten Umbanda e Candomblé / Tradições indígenas / Sem informação to Afro / Indígena / Sem info. The full legend and the explainer still say “salário mínimo” on Renda. **Tap toggles** the group; **long-press (500ms) solos** it (context menu suppressed; a moving finger cancels the press so rail scrolling works). The rail hides when the sheet expands (the full legend list takes over) or while a stats card is docked. The sheet headline reports filters so the map never lies silently: `Só Parda · …` when soloed, `Mostrando k de n grupos · …` for partial sets.
 
 ### Floating controls
 
@@ -298,6 +314,10 @@ A compact HUD is injected only on loopback hosts (`localhost`, `127.0.0.1`, `::1
 - **Cores** (localhost, Raça only): a select of 5-hue presets mapped to `branca`, `preta`, `amarela`, `parda`, `indigena`. The controls are hidden in Renda and Óbitos.
 - Camera jumps (localhost only, ignored while typing in search): **1** Brasil (`fitBounds` of the default country bbox), **2** Rio center `[-43.1729, -22.9068]` at zoom **15**. Same actions as the two HUD buttons.
 - Monospace overlay, not a product card. All logic stays in `index.html`. The panel scrolls if the color block would otherwise cover zoom/footer.
+
+# Remotion video example
+
+`video/` is a short Remotion promo (compositions `Dotsbr` 1920×1080 and `DotsbrMobile` 1080×1920, ~20s) that retells the race-view story on live MapLibre plates of `censo2022.pmtiles`: national view, then a direct flyTo to Rio at z11 (50 people/dot) with no hold or zoom-out. The 9:16 cut keeps type and the legend inside the Reels/Stories safe zone (below the username, above the caption, left of the like rail). Camera is `jumpTo` per frame, not MapLibre `flyTo()`. Basemap is the same Mapbox light-v10 as the product when `REMOTION_MAPBOX_TOKEN` is set in `video/.env`. Preview and tile URLs: [`video.md`](video.md).
 
 # Analytics
 

@@ -143,6 +143,81 @@ def merge_hover() -> None:
     build_hover_tiles()
 
 
+def religion_dir() -> Path:
+    return ROOT / "data/censo2022/output/tiles/religion"
+
+
+def build_apond_mbtiles(dest: Path) -> bool:
+    """Tippecanoe the dissolved APOND polygons. Returns False if none exist."""
+    parts = sorted(religion_dir().glob("apond_[A-Z][A-Z].geojson"))
+    if not parts:
+        return False
+    merged = religion_dir() / "apond.geojson"
+    run_mapshaper(
+        [
+            "-i",
+            *[str(p) for p in parts],
+            "combine-files",
+            "-merge-layers",
+            "force",
+            "-simplify",
+            "dp",
+            "0.003",
+            "keep-shapes",
+            "-o",
+            "format=geojson",
+            str(merged),
+        ]
+    )
+    # Religion hover is the weighting area at every zoom — never setor.
+    subprocess.run(
+        [
+            "tippecanoe",
+            "-f",
+            "-o",
+            str(dest),
+            "-l",
+            "aponds",
+            "-Z3",
+            "-z12",
+            "--generate-ids",
+            "--simplification=10",
+            str(merged),
+        ],
+        check=True,
+    )
+    return True
+
+
+def ensure_apond_hover_layer() -> None:
+    """Replace the aponds layer on hover.pmtiles.
+
+    tile-join stacks layers, so joining a new `aponds` onto an archive that
+    already has one would duplicate the hover hit (including leftover water
+    polygons). Rebuild mun/setor/aponds together whenever the race GeoJSON
+    still exists; only append when this is the first aponds layer.
+    """
+    mun = RACE_DIR / "municipality.geojson"
+    setor = RACE_DIR / "census_tract.geojson"
+    if mun.exists() or setor.exists():
+        build_hover_tiles()
+        return
+    out_dir = ROOT / "data" / "tiles"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    hover = out_dir / "hover.pmtiles"
+    tmp_apond = out_dir / "hover_aponds.mbtiles"
+    if not build_apond_mbtiles(tmp_apond):
+        print("skip APOND hover: no apond_UF.geojson files")
+        return
+    tmp_out = out_dir / "hover_with_aponds.pmtiles"
+    inputs = [str(hover)] if hover.exists() else []
+    inputs.append(str(tmp_apond))
+    subprocess.run(["tile-join", "-f", "-o", str(tmp_out), *inputs], check=True)
+    tmp_out.replace(hover)
+    tmp_apond.unlink(missing_ok=True)
+    print(f"wrote {hover} (aponds layer)")
+
+
 def build_hover_tiles() -> None:
     """Municípios at z3–9 and setores at z10–14, one PMTiles archive.
 
@@ -158,8 +233,10 @@ def build_hover_tiles() -> None:
     hover = out_dir / "hover.pmtiles"
     tmp_mun = out_dir / "hover_municipios.mbtiles"
     tmp_setor = out_dir / "hover_setores.mbtiles"
-    if not mun.exists() and not setor.exists():
-        print(f"skip hover tiles: no {mun.name} or {setor.name}")
+    tmp_apond = out_dir / "hover_aponds.mbtiles"
+    apond_parts_early = sorted(religion_dir().glob("apond_[A-Z][A-Z].geojson"))
+    if not mun.exists() and not setor.exists() and not apond_parts_early:
+        print(f"skip hover tiles: no {mun.name}, {setor.name}, or APOND files")
         return
     if mun.exists():
         subprocess.run(
@@ -209,7 +286,8 @@ def build_hover_tiles() -> None:
             ],
             check=True,
         )
-    parts = [p for p in (tmp_mun, tmp_setor) if p.exists()]
+    build_apond_mbtiles(tmp_apond)
+    parts = [p for p in (tmp_mun, tmp_setor, tmp_apond) if p.exists()]
     if parts:
         # Always join into PMTiles so a single-layer run is not left as MBTiles.
         subprocess.run(
@@ -226,5 +304,7 @@ if __name__ == "__main__":
 
     if sys.argv[1:] == ["tiles"]:
         build_hover_tiles()
+    elif sys.argv[1:] == ["aponds"]:
+        ensure_apond_hover_layer()
     else:
         merge_hover()

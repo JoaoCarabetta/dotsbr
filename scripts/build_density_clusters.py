@@ -197,7 +197,7 @@ def prepare_working(uf: str, theme: Theme) -> Path:
             "-join",
             str(counts_csv),
             "keys=id_setor_censitario,id_setor_censitario",
-            "string-fields=id_setor_censitario",
+            "string-fields=id_setor_censitario,id_apond",
             "-o",
             "format=geojson",
             str(work),
@@ -232,7 +232,15 @@ def write_zoom(
     target = theme.per_dot[zoom - 3]
     pops = [num_prop(p.get(theme.total_field)) for p in features]
     areas = [num_prop(p.get("AREA_KM2")) for p in features]
-    classes = [density_class(p.get("CD_SIT")) for p in features]
+    # Religion mix is valid only inside the weighting area. Prefix the class
+    # so adjacent setores from two APONDs never dissolve across that border.
+    if theme.id == "religion":
+        classes = [
+            f"{p.get('id_apond') or ''}|{density_class(p.get('CD_SIT'))}"
+            for p in features
+        ]
+    else:
+        classes = [density_class(p.get("CD_SIT")) for p in features]
     roots = cluster_ids(pops, areas, classes, nbr, target)
 
     remap: dict[int, int] = {}
@@ -269,7 +277,9 @@ def write_zoom(
             "-dissolve",
             "cluster_id",
             f"sum-fields={category_sum},{theme.total_field}",
-            "copy-fields=sigla_uf,density_class",
+            "copy-fields=sigla_uf,density_class,id_apond"
+            if theme.id == "religion"
+            else "copy-fields=sigla_uf,density_class",
             "-o",
             "format=geojson",
             str(out_path),
@@ -302,10 +312,15 @@ def parse_zooms(raw: str | None) -> list[int]:
 def main(argv: list[str] | None = None) -> None:
     args = argv if argv is not None else sys.argv[1:]
     if not 1 <= len(args) <= 3:
-        raise SystemExit(f"Usage: {sys.argv[0]} <UF> [zooms] [race|income|deaths]")
+        raise SystemExit(f"Usage: {sys.argv[0]} <UF> [zooms] [race|income|deaths|religion]")
     uf = parse_uf(args[0])
-    zooms = parse_zooms(args[1] if len(args) > 1 else None)
-    theme = get_theme(args[2] if len(args) > 2 else None)
+    # Allow `script UF religion` (theme as 2nd arg) like makefiles.sh.
+    if len(args) >= 2 and args[1] in ("race", "income", "deaths", "religion"):
+        zooms = parse_zooms(None)
+        theme = get_theme(args[1])
+    else:
+        zooms = parse_zooms(args[1] if len(args) > 1 else None)
+        theme = get_theme(args[2] if len(args) > 2 else None)
     theme.output_dir.mkdir(parents=True, exist_ok=True)
     work = prepare_working(uf, theme)
     features, nbr = load_features(work)

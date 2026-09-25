@@ -1,7 +1,7 @@
 #!/bin/bash
 # Check if UF argument is provided
 if [ $# -eq 0 ]; then
-    echo "Usage: $0 <UF> [zooms] [race|income|deaths]"
+    echo "Usage: $0 <UF> [zooms] [race|income|deaths|religion]"
     echo "Example: $0 RJ"
     echo "Example: $0 SE 3,4,5,6 income"
     exit 1
@@ -13,7 +13,7 @@ ONLY_ZOOMS="${2:-}"
 THEME="${3:-race}"
 # A theme may be passed as the second argument when all zooms are wanted.
 case "$ONLY_ZOOMS" in
-    race|income|deaths)
+    race|income|deaths|religion)
         THEME="$ONLY_ZOOMS"
         ONLY_ZOOMS=""
         ;;
@@ -55,8 +55,14 @@ case "$THEME" in
         point_property="cat"
         per_dot_values=(200 100 50 25 12 10 8 6 4 3 2 1)
         ;;
+    religion)
+        # Same mix at every zoom: APOND religion allocated onto setor/cluster.
+        categories=("relig_catolica" "relig_evangelica" "relig_espirita" "relig_afro" "relig_indigena" "relig_sem_religiao" "relig_outras" "relig_sem_info")
+        point_property="cat"
+        per_dot_values=(3900 1750 790 350 130 105 80 60 44 31 22 18)
+        ;;
     *)
-        echo "Unknown theme: $THEME (expected race, income, or deaths)"
+        echo "Unknown theme: $THEME (expected race, income, deaths, or religion)"
         exit 1
         ;;
 esac

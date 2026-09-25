@@ -23,7 +23,39 @@
     <meta name="twitter:description" content="O Brasil em pontos: cada ponto é um grupo de pessoas do Censo de 2022. Aproxime e veja o seu bairro.">
     <meta name="twitter:image" content="https://carabetta.xyz/dotsbr/card.jpg">
     <link rel="canonical" href="https://carabetta.xyz/dotsbr/">
+    <link rel="alternate" type="text/markdown" href="https://carabetta.xyz/dotsbr.md">
     <link rel="image_src" href="https://carabetta.xyz/dotsbr/card.jpg">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "headline": "dotsbr — Brazil as census dots",
+          "name": "dotsbr",
+          "description": "O Brasil em pontos: cada ponto é um grupo de pessoas do Censo de 2022. Aproxime e veja o seu bairro.",
+          "url": "https://carabetta.xyz/dotsbr/",
+          "dateModified": "2026-09-07",
+          "inLanguage": "pt-BR",
+          "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://carabetta.xyz/" },
+              { "@type": "ListItem", "position": 2, "name": "dotsbr", "item": "https://carabetta.xyz/dotsbr/" }
+            ]
+          }
+        },
+        {
+          "@type": "Dataset",
+          "name": "dotsbr — Censo 2022 dot map",
+          "description": "National Census 2022 dot-density visualization of Brazil. Race and household-income views from IBGE census-tract aggregates, served as static PMTiles.",
+          "url": "https://carabetta.xyz/dotsbr/",
+          "creator": { "@type": "Person", "name": "João Carabetta", "url": "https://carabetta.xyz/" },
+          "isBasedOn": "https://ftp.ibge.gov.br/Censos/Censo_Demografico_2022/Agregados_por_Setores_Censitarios/"
+        }
+      ]
+    }
+    </script>
     <!-- Relative so localhost and /dotsbr/ both resolve; crawlers use og:image. -->
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="icon" href="favicon.ico" sizes="32x32">
@@ -60,6 +92,18 @@
             --chrome-shadow: 0 1px 4px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
             /* Slim attribution strip, not the old 60px bar. */
             --footer-height: 32px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         html, body {
@@ -309,10 +353,26 @@
 
         .race-row-label {
             flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Viewport mix, not the filter. Tabular so 8% and 43% stay aligned. */
+        .race-row-pct {
+            flex: 0 0 auto;
+            min-width: 2.75em;
+            margin-left: 8px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-size: 11px;
+            color: #5f6368;
         }
 
         .race-row.is-off .race-swatch,
-        .race-row.is-off .race-row-label {
+        .race-row.is-off .race-row-label,
+        .race-row.is-off .race-row-pct {
             opacity: 0.35;
         }
 
@@ -1047,6 +1107,13 @@
                 flex: 0 0 11px;
             }
 
+            .legend-chip-pct {
+                font-variant-numeric: tabular-nums;
+                font-weight: 500;
+                font-size: 12px;
+                color: #5f6368;
+            }
+
             .legend-chip.is-off {
                 opacity: 0.45;
             }
@@ -1126,6 +1193,15 @@
     </style>
 </head>
 <body>
+<a class="sr-only" href="#intro-title">pular para o mapa</a>
+<section class="sr-only" id="dotsbr-method" aria-labelledby="dotsbr-method-title">
+    <h2 id="dotsbr-method-title">Sobre o dotsbr</h2>
+    <p>dotsbr é um mapa nacional de densidade de pontos do Censo Demográfico 2022. Na vista de raça, cada ponto é um grupo de pessoas colorido pela raça declarada. Na vista de renda, cada ponto é um grupo de domicílios colorido pela renda típica de quem é responsável, em salários mínimos. Na vista de religião, a cor é estimada para um conjunto de vizinhanças (pessoas de 10 anos ou mais) — não para cada quarteirão.</p>
+    <h3>Fonte</h3>
+    <p>Agregados por setores censitários do IBGE. Tiles estáticos em PMTiles, sem gzip, com HTTP Range. Texto completo em <a href="https://carabetta.xyz/dotsbr.md">dotsbr.md</a>.</p>
+    <h3>Como ler</h3>
+    <p>Um ponto não é um endereço. Na escala do país os pontos sentam nos assentamentos; de perto, nos setores. Quanto mais o zoom, menor o N.</p>
+</section>
 <div id="map"></div>
 <!-- Desktop chrome is ONE story-first panel (mobile-sheet lesson applied):
      title with the active lens, hero scale line, switcher, explainer, search,
@@ -1150,6 +1226,7 @@
     <div class="view-switcher" id="view-switcher" role="group" aria-label="Visualização">
         <button type="button" data-view="race" aria-pressed="true">Raça</button>
         <button type="button" data-view="income" aria-pressed="false">Renda</button>
+        <button type="button" data-view="religion" aria-pressed="false">Religião</button>
     </div>
     <p class="intro-explainer" id="intro-explainer">Cada ponto é um grupo de pessoas. A cor mostra a raça que elas declararam no Censo de 2022. Quanto mais você aproxima o mapa, menos pessoas cada ponto representa.</p>
     <p class="coverage-note" id="coverage-note" hidden></p>
@@ -1293,6 +1370,7 @@
             <div class="view-switcher" id="m-view-switcher" role="group" aria-label="Visualização">
                 <button type="button" data-view="race" aria-pressed="true">Raça</button>
                 <button type="button" data-view="income" aria-pressed="false">Renda</button>
+                <button type="button" data-view="religion" aria-pressed="false">Religião</button>
             </div>
             <p class="sheet-explainer" id="sheet-explainer">Cada ponto é um grupo de pessoas. A cor mostra a raça que elas declararam no Censo de 2022. Quanto mais você aproxima o mapa, menos pessoas cada ponto representa.</p>
             <ul class="legend-races sheet-legend" id="m-legend"></ul>
@@ -1414,6 +1492,26 @@
                 ['death_age_suppressed', 'Idade não divulgada', '#777777']
             ],
             perDot: [200, 100, 50, 25, 12, 10, 8, 6, 4, 3, 2, 1]
+        },
+        religion: {
+            layer: 'points-religion',
+            property: 'cat',
+            label: 'Religião',
+            unit: 'pessoas de 10+',
+            explainer: 'Cada ponto é um grupo de pessoas com 10 anos ou mais. A cor é a religião declarada no Censo de 2022, estimada para um conjunto de vizinhanças (não para cada quarteirão). Aproximar o mapa muda só quantas pessoas cada ponto representa, não o recorte da cor.',
+            // Official P0410 groups, national size order (amostra 2022).
+            // 4th slot is the chip-rail short label.
+            categories: [
+                ['relig_catolica', 'Católica', '#2c7fb8', 'Católica'],
+                ['relig_evangelica', 'Evangélicas', '#e6550d', 'Evangélicas'],
+                ['relig_sem_religiao', 'Sem religião', '#737373', 'Sem religião'],
+                ['relig_afro', 'Umbanda e Candomblé', '#756bb1', 'Afro'],
+                ['relig_espirita', 'Espírita', '#31a354', 'Espírita'],
+                ['relig_indigena', 'Tradições indígenas', '#8c510a', 'Indígena'],
+                ['relig_outras', 'Outras', '#f768a1', 'Outras'],
+                ['relig_sem_info', 'Sem informação', '#bdbdbd', 'Sem info']
+            ],
+            perDot: [3900, 1750, 790, 350, 130, 105, 80, 60, 44, 31, 22, 18]
         }
     };
     // Pipeline/tiles still have deaths; the product UI does not.
@@ -1539,6 +1637,12 @@
         const z = parseInt(Number(zoom).toFixed(0), 10);
         if (z < 3) return '—';
         // z3–6 scatter inside density-clustered setores, not the município polygon.
+        if (currentView === 'religion') {
+            // Same APOND mix at every zoom; only the host polygon coarsens.
+            if (z <= 6) return 'APOND em setor agrupado';
+            if (z <= 14) return 'APOND em setor';
+            return 'APOND em setor (overzoom)';
+        }
         if (z <= 6) return 'setor agrupado';
         if (z <= 14) return 'setor';
         // Camera maxZoom 15 overzooms the z=14 census tiles; nothing is generated at 15.
@@ -1654,7 +1758,7 @@
     }
 
     // ------- TOOLTIP --------
-    // Numbers follow the cursor on the map; the legend card is filter + scale only.
+    // Hover follows the cursor; the legend also carries the viewport mix.
 
     const popup = new maplibregl.Popup({
         closeButton: false,
@@ -1724,6 +1828,24 @@
                 return [item[1], count.toLocaleString('pt-BR') + ' · ' + pct + '%'];
             });
             rows.push(['Mortes', total.toLocaleString('pt-BR')]);
+            return { name: name, rows: rows };
+        }
+        if (currentView === 'religion') {
+            const categories = VIEW_CONFIGS.religion.categories;
+            const total = numberValue(properties.pessoas_10) || categories.reduce(function (sum, item) {
+                return sum + numberValue(properties[item[0]]);
+            }, 0);
+            if (!total) return null;
+            const unstable = new Set(String(properties.unstable_cats || '').split(',').filter(Boolean));
+            const rows = categories.map(function (item) {
+                const count = numberValue(properties[item[0]]);
+                const pct = total ? Math.round(count / total * 100) : 0;
+                const label = unstable.has(item[0])
+                    ? count.toLocaleString('pt-BR') + ' · estimativa instável'
+                    : count.toLocaleString('pt-BR') + ' · ' + pct + '%';
+                return [item[1], label];
+            });
+            rows.push(['Pessoas de 10 anos ou mais', total.toLocaleString('pt-BR')]);
             return { name: name, rows: rows };
         }
         // Same display order as the legend: population size, descending.
@@ -1930,7 +2052,8 @@
             }
         });
         [
-            ['income-points', 'censo2022_income', 'points-income', 'income']
+            ['income-points', 'censo2022_income', 'points-income', 'income'],
+            ['religion-points', 'censo2022_religion', 'points-religion', 'religion']
         ].forEach(function (item) {
             map.addSource(item[0], {
                 type: 'vector',
@@ -2040,6 +2163,48 @@
                 ]
             },
         });
+
+        // Religion hover is the weighting area at every zoom. Hidden until
+        // that view is active so setor/município hits stay exclusive.
+        map.addSource('aponds', {
+            type: 'vector',
+            url: 'pmtiles://' + pmtilesUrl('hover'),
+            minzoom: 3,
+            maxzoom: 12
+        });
+        map.addLayer({
+            id: 'aponds-fill',
+            type: 'fill',
+            source: 'aponds',
+            'source-layer': 'aponds',
+            layout: { visibility: 'none' },
+            paint: {
+                'fill-color': '#202124',
+                'fill-opacity': [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false],
+                    0.08,
+                    0
+                ]
+            }
+        });
+        map.addLayer({
+            id: 'aponds-border',
+            type: 'line',
+            source: 'aponds',
+            'source-layer': 'aponds',
+            layout: { visibility: 'none' },
+            paint: {
+                'line-color': '#202124',
+                'line-width': 1.2,
+                'line-opacity': [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false],
+                    1,
+                    0
+                ]
+            }
+        });
     }
 
     // Cached styles can fire `load` during `new maplibregl.Map()`; register
@@ -2059,23 +2224,21 @@
     map.on('load', onMapReady);
     if (map.loaded()) onMapReady();
 
-    let censusTractID = null;
     // Vector hover tiles need sourceLayer; GeoJSON generateId was enough before.
+    const hoverIds = { setores: null, municipios: null, aponds: null };
+
     function hoverRef(source, id) {
         return { source: source, sourceLayer: source, id: id };
     }
 
-    let municipalityID = null;
-
     function clearHoverState() {
-        if (censusTractID && map.getSource('setores')) {
-            map.removeFeatureState(hoverRef('setores', censusTractID));
-        }
-        if (municipalityID && map.getSource('municipios')) {
-            map.removeFeatureState(hoverRef('municipios', municipalityID));
-        }
-        censusTractID = null;
-        municipalityID = null;
+        Object.keys(hoverIds).forEach(function (source) {
+            const id = hoverIds[source];
+            if (id && map.getSource(source)) {
+                map.removeFeatureState(hoverRef(source, id));
+            }
+            hoverIds[source] = null;
+        });
         map.getCanvas().style.cursor = '';
         popup.remove();
         hideStatsDock();
@@ -2129,18 +2292,59 @@
     }
 
     function setHoveredFeature(source, id) {
-        const previous = source === 'setores' ? censusTractID : municipalityID;
-        if (previous && previous !== id) {
+        Object.keys(hoverIds).forEach(function (other) {
+            if (other === source) return;
+            const prev = hoverIds[other];
+            if (prev && map.getSource(other)) {
+                map.removeFeatureState(hoverRef(other, prev));
+            }
+            hoverIds[other] = null;
+        });
+        const previous = hoverIds[source];
+        if (previous && previous !== id && map.getSource(source)) {
             map.removeFeatureState(hoverRef(source, previous));
         }
-        if (source === 'setores') censusTractID = id;
-        else municipalityID = id;
+        hoverIds[source] = id;
         map.setFeatureState(hoverRef(source, id), { hover: true });
+    }
+
+    function syncHoverLayers(view) {
+        const religion = view === 'religion';
+        [
+            ['aponds-fill', religion],
+            ['aponds-border', religion],
+            ['setores-fill', !religion],
+            ['setores-border', !religion],
+            ['municipios-fill', !religion],
+            ['municipios-border', !religion]
+        ].forEach(function (item) {
+            if (!map.getLayer(item[0])) return;
+            map.setLayoutProperty(item[0], 'visibility', item[1] ? 'visible' : 'none');
+        });
     }
 
     // One query for every surface that shows polygon stats: desktop hover
     // (cursor popup), desktop click (panel dock), mobile tap (stats dock).
     function detailsAtPoint(point) {
+        // Sample religion is only valid at the weighting area. Never query
+        // setor or município here — those polygons would invent a finer mix.
+        if (currentView === 'religion') {
+            if (!map.getLayer('aponds-fill')) return null;
+            const features = map.queryRenderedFeatures(point, { layers: ['aponds-fill'] });
+            if (!features.length) return null;
+            const feature = features[0];
+            const props = feature.properties || {};
+            const mun = props.municipio;
+            const uf = props.sigla_uf;
+            const name = mun
+                ? (uf ? mun + ' · ' + uf : mun)
+                : 'Conjunto de vizinhanças';
+            return {
+                feature: feature,
+                source: 'aponds',
+                data: tooltipData(name, props)
+            };
+        }
         const isCensusTract = map.getZoom() >= 10;
         const layer = isCensusTract ? 'setores-fill' : 'municipios-fill';
         if (!map.getLayer(layer)) return null;
@@ -2227,15 +2431,33 @@
     map.on('move', function () {
         refreshDevPanel();
     });
+
+    map.on('moveend', scheduleViewportShares);
+    map.on('sourcedata', function (e) {
+        // Tiles often arrive after the camera stops; hover highlight must
+        // not retrigger this (feature-state paints are not source events).
+        if (e.dataType !== 'source' || !e.isSourceLoaded) return;
+        if (
+            e.sourceId === 'municipios' ||
+            e.sourceId === 'setores' ||
+            e.sourceId === 'aponds' ||
+            e.sourceId === 'points' ||
+            e.sourceId === 'income-points' ||
+            e.sourceId === 'religion-points' ||
+            e.sourceId === 'deaths-points'
+        ) {
+            scheduleViewportShares();
+        }
+    });
     
     map.on('zoomend', function () {
-        if (map.getZoom() >= 10) {
-            if (municipalityID && map.getSource('municipios')) {
-                map.setFeatureState(hoverRef('municipios', municipalityID), { hover: false });
-            }
-        } else {
-            if (censusTractID && map.getSource('setores')) {
-                map.setFeatureState(hoverRef('setores', censusTractID), { hover: false });
+        if (currentView !== 'religion') {
+            if (map.getZoom() >= 10) {
+                if (hoverIds.municipios && map.getSource('municipios')) {
+                    map.setFeatureState(hoverRef('municipios', hoverIds.municipios), { hover: false });
+                }
+            } else if (hoverIds.setores && map.getSource('setores')) {
+                map.setFeatureState(hoverRef('setores', hoverIds.setores), { hover: false });
             }
         }
         // Drop the popup/dock when the hover layer switches so a município
@@ -2243,6 +2465,190 @@
         popup.remove();
         hideStatsDock();
     });
+
+    // Viewport mix for the legend. Hover polygons carry official counts;
+    // counting dots would be a sample (1 ponto = N) and would miss filtered
+    // groups. A place that only peeks into the frame is counted in full —
+    // tiled geometry is already clipped, so we cannot area-weight.
+    function hoverLayerForViewport() {
+        if (currentView === 'religion') {
+            return { layer: 'aponds-fill', source: 'aponds' };
+        }
+        if (map.getZoom() >= 10) {
+            return { layer: 'setores-fill', source: 'setores' };
+        }
+        return { layer: 'municipios-fill', source: 'municipios' };
+    }
+
+    function featureIdentity(feature, source) {
+        const props = feature.properties || {};
+        if (source === 'municipios') return 'm:' + (props.id_municipio || feature.id);
+        if (source === 'setores') return 's:' + (props.id_setor_censitario || feature.id);
+        if (source === 'aponds') return 'a:' + (props.id_apond || feature.id);
+        return String(feature.id);
+    }
+
+    function incomeCategoryOfProps(props) {
+        // Same 2022 SM bins as scripts/themes.py income_bin. Hover stores
+        // the neighborhood median, not a household-level mix.
+        const raw = props.renda_mediana;
+        const median = Number(raw);
+        if (raw === '' || raw == null || !Number.isFinite(median) || median <= 0) {
+            return 'income_sem_dado';
+        }
+        const sm = 1212;
+        if (median <= sm) return 'income_ate_1sm';
+        if (median <= 2 * sm) return 'income_1_2sm';
+        if (median <= 3 * sm) return 'income_2_3sm';
+        if (median <= 5 * sm) return 'income_3_5sm';
+        if (median <= 10 * sm) return 'income_5_10sm';
+        return 'income_mais_10sm';
+    }
+
+    function emptyCategoryCounts(config) {
+        const counts = {};
+        config.categories.forEach(function (item) { counts[item[0]] = 0; });
+        return counts;
+    }
+
+    function viewportQueryBox() {
+        return [[0, 0], [map.getContainer().clientWidth, map.getContainer().clientHeight]];
+    }
+
+    function countViewportDots(config) {
+        // Fallback when hover tiles lack this view's fields (income/deaths
+        // on an older hover.pmtiles). Counts painted dots in the frame.
+        if (!map.getLayer(config.layer)) return null;
+        const features = map.queryRenderedFeatures(viewportQueryBox(), {
+            layers: [config.layer]
+        });
+        if (!features.length) return null;
+        const counts = emptyCategoryCounts(config);
+        features.forEach(function (feature) {
+            const key = (feature.properties || {})[config.property];
+            if (key in counts) counts[key] += 1;
+        });
+        return counts;
+    }
+
+    function accumulateViewportCounts() {
+        const config = VIEW_CONFIGS[currentView];
+        const hover = hoverLayerForViewport();
+        if (!map.getLayer(hover.layer)) return countViewportDots(config);
+        const features = map.queryRenderedFeatures(viewportQueryBox(), {
+            layers: [hover.layer]
+        });
+        if (!features.length) return countViewportDots(config);
+
+        const counts = emptyCategoryCounts(config);
+        const seen = new Set();
+        const useIncomeBin = currentView === 'income';
+        const hasCatFields = !useIncomeBin && features.some(function (feature) {
+            const props = feature.properties || {};
+            return config.categories.some(function (item) {
+                return numberValue(props[item[0]]) > 0;
+            });
+        });
+        const hasIncomeFields = useIncomeBin && features.some(function (feature) {
+            const props = feature.properties || {};
+            return props.renda_mediana != null || props.domicilios != null;
+        });
+
+        if (useIncomeBin && !hasIncomeFields) return countViewportDots(config);
+        if (!useIncomeBin && !hasCatFields) return countViewportDots(config);
+
+        features.forEach(function (feature) {
+            const id = featureIdentity(feature, hover.source);
+            if (seen.has(id)) return;
+            seen.add(id);
+            const props = feature.properties || {};
+            if (useIncomeBin) {
+                const households = numberValue(props.domicilios);
+                if (!households) return;
+                const cat = incomeCategoryOfProps(props);
+                if (cat in counts) counts[cat] += households;
+                return;
+            }
+            config.categories.forEach(function (item) {
+                counts[item[0]] += numberValue(props[item[0]]);
+            });
+        });
+        return counts;
+    }
+
+    function sharesFromCounts(counts, keys) {
+        const total = keys.reduce(function (sum, key) {
+            return sum + (counts[key] || 0);
+        }, 0);
+        if (!total) return null;
+        // Largest remainder so the row of integers still adds to 100.
+        const rows = keys.map(function (key) {
+            const exact = (counts[key] || 0) / total * 100;
+            const pct = Math.floor(exact);
+            return { key: key, pct: pct, frac: exact - pct };
+        });
+        let leftover = 100 - rows.reduce(function (sum, row) { return sum + row.pct; }, 0);
+        rows.slice().sort(function (a, b) { return b.frac - a.frac; }).forEach(function (row) {
+            if (leftover <= 0) return;
+            row.pct += 1;
+            leftover -= 1;
+        });
+        const out = {};
+        rows.forEach(function (row) { out[row.key] = row.pct; });
+        return out;
+    }
+
+    let lastViewportShares = null;
+    let lastShareView = null;
+    let shareTimer = null;
+
+    function formatShare(pct) {
+        return pct == null ? '—' : pct + '%';
+    }
+
+    function paintViewportShares(shares) {
+        const config = VIEW_CONFIGS[currentView];
+        const title = 'Participação no recorte visível do mapa';
+        document.querySelectorAll('#legend-races .race-row, #m-legend .race-row').forEach(function (row) {
+            const el = row.querySelector('.race-row-pct');
+            if (!el) return;
+            const pct = shares ? shares[row.dataset.category] : null;
+            el.textContent = formatShare(pct);
+            el.title = title;
+        });
+        document.querySelectorAll('#chip-rail .legend-chip').forEach(function (chip) {
+            const el = chip.querySelector('.legend-chip-pct');
+            if (!el) return;
+            const pct = shares ? shares[chip.dataset.category] : null;
+            el.textContent = formatShare(pct);
+            const item = config.categories.find(function (c) { return c[0] === chip.dataset.category; });
+            const name = item ? item[1] : chip.dataset.category;
+            chip.title = name + (pct == null ? '' : ' · ' + pct + '% do recorte visível') +
+                ' — toque para mostrar ou esconder; segure para ver só este grupo';
+        });
+    }
+
+    function updateViewportShares() {
+        if (currentView !== lastShareView) {
+            lastViewportShares = null;
+            lastShareView = currentView;
+            paintViewportShares(null);
+        }
+        const config = VIEW_CONFIGS[currentView];
+        const counts = accumulateViewportCounts();
+        if (!counts) {
+            if (!lastViewportShares) paintViewportShares(null);
+            return;
+        }
+        const keys = config.categories.map(function (item) { return item[0]; });
+        lastViewportShares = sharesFromCounts(counts, keys);
+        paintViewportShares(lastViewportShares);
+    }
+
+    function scheduleViewportShares() {
+        clearTimeout(shareTimer);
+        shareTimer = setTimeout(updateViewportShares, 120);
+    }
 
     // Toggle/solo are shared by legend rows (desktop card + sheet) and chips,
     // so every surface stays in the same Set and the same map filter.
@@ -2268,7 +2674,8 @@
         row.dataset.category = item[0];
         row.innerHTML =
             '<button type="button" class="race-row-toggle" role="checkbox" aria-checked="true">' +
-            '<span class="race-swatch"></span><span class="race-row-label"></span></button>' +
+            '<span class="race-swatch"></span><span class="race-row-label"></span>' +
+            '<span class="race-row-pct" title="Participação no recorte visível do mapa">—</span></button>' +
             '<button type="button" class="solo-button" title="Ver só este grupo">S</button>';
         row.querySelector('.race-swatch').style.backgroundColor = item[2];
         row.querySelector('.race-row-label').textContent = item[1];
@@ -2297,6 +2704,7 @@
         });
         renderChipRail();
         syncFilterUi();
+        scheduleViewportShares();
     }
 
     // The chip rail is the always-visible legend of the phone peek state.
@@ -2312,7 +2720,7 @@
             chip.dataset.category = item[0];
             chip.setAttribute('aria-pressed', 'true');
             chip.title = item[1] + ' — toque para mostrar ou esconder; segure para ver só este grupo';
-            chip.innerHTML = '<span class="race-swatch"></span><span class="legend-chip-label"></span>';
+            chip.innerHTML = '<span class="race-swatch"></span><span class="legend-chip-label"></span><span class="legend-chip-pct">—</span>';
             chip.querySelector('.race-swatch').style.backgroundColor = item[2];
             // Optional 4th slot: short chip label when the legend name is too long.
             chip.querySelector('.legend-chip-label').textContent = item[3] || item[1];
@@ -2420,15 +2828,16 @@
         document.querySelectorAll('#view-switcher button, #m-view-switcher button').forEach(function (button) {
             button.setAttribute('aria-pressed', button.dataset.view === view ? 'true' : 'false');
         });
-        if (map.getLayer('points')) {
-            Object.keys(VIEW_CONFIGS).forEach(function (key) {
-                map.setLayoutProperty(
-                    VIEW_CONFIGS[key].layer,
-                    'visibility',
-                    key === view ? 'visible' : 'none'
-                );
-            });
-        }
+        Object.keys(VIEW_CONFIGS).forEach(function (key) {
+            const layer = VIEW_CONFIGS[key].layer;
+            if (!map.getLayer(layer)) return;
+            map.setLayoutProperty(
+                layer,
+                'visibility',
+                key === view ? 'visible' : 'none'
+            );
+        });
+        if (map.getSource('points')) syncHoverLayers(view);
         renderLegend();
         if (view === 'race') applyDevPalette();
         updateMapFilter();
@@ -2529,8 +2938,12 @@
         if (map.getZoom() < 6) return 'Brasil';
         const pt = map.project(map.getCenter());
         const layers = [];
-        if (map.getLayer('municipios-fill')) layers.push('municipios-fill');
-        if (map.getLayer('setores-fill')) layers.push('setores-fill');
+        if (currentView === 'religion') {
+            if (map.getLayer('aponds-fill')) layers.push('aponds-fill');
+        } else {
+            if (map.getLayer('municipios-fill')) layers.push('municipios-fill');
+            if (map.getLayer('setores-fill')) layers.push('setores-fill');
+        }
         if (!layers.length) return null;
         const features = map.queryRenderedFeatures(pt, { layers: layers });
         if (!features.length) return null;
@@ -2556,6 +2969,10 @@
         const active = activeCategories[currentView];
         const items = config.categories.filter(function (item) {
             return active.has(item[0]);
+        }).map(function (item) {
+            const pct = lastViewportShares ? lastViewportShares[item[0]] : null;
+            const label = pct == null ? item[1] : item[1] + ' ' + pct + '%';
+            return [item[0], label, item[2]];
         });
         const src = map.getCanvas();
         // Match the live canvas so phone-width maps are not blown up to 2160
@@ -2974,7 +3391,9 @@
         document.getElementById('dev-center').textContent = center.lng.toFixed(3) + ', ' + center.lat.toFixed(3);
         document.getElementById('dev-bounds').textContent =
             sw.lng.toFixed(2) + ',' + sw.lat.toFixed(2) + ' / ' + ne.lng.toFixed(2) + ',' + ne.lat.toFixed(2);
-        document.getElementById('dev-hover').textContent = zoom >= 10 ? 'setor' : 'município';
+        document.getElementById('dev-hover').textContent = currentView === 'religion'
+            ? 'área de ponderação'
+            : (zoom >= 10 ? 'setor' : 'município');
         document.getElementById('dev-source').textContent = tileGeometrySource(zoom);
     }
 

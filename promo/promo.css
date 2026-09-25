@@ -1,0 +1,644 @@
+/* dotsbr — 15s promo.
+ *
+ * Two rules hold this file together:
+ *
+ * 1. NO transitions and NO keyframe animations. Every frame of the film is a
+ *    single static state painted by promo.js; a CSS transition would render
+ *    half-finished into whatever frame the capture happened to grab.
+ * 2. Type, cards, grays and shadows are lifted from index.html so the chrome on
+ *    screen is the product's chrome. Sizes are the product's CSS pixels times
+ *    --ui (the film sits ~1.3× closer than a real browser so 12px UI text
+ *    survives video compression), which keeps the layout proportions intact.
+ */
+
+:root {
+    --ink: #202124;
+    --muted: #5f6368;
+    --hairline: #e8eaed;
+    --track: #f1f3f4;
+    --sans: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Times New Roman', serif;
+    --shadow: 0 1px 4px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
+    --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.16), 0 10px 40px rgba(0, 0, 0, 0.12);
+    /* Product chrome scale, and the story-column grid the type hangs on. */
+    --ui: 1.32;
+    --story-x: 112px;
+    --story-w: 760px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: #202124;
+    overflow: hidden;
+}
+
+/* The film is authored at exactly 1920×1080 and the capture viewport matches,
+   so nothing reflows between a hand-opened browser and the render. */
+#stage {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: #f0f0f0;
+    transform-origin: top left;
+}
+
+#map {
+    position: absolute;
+    inset: 0;
+}
+
+#stage > *:not(#map) {
+    position: absolute;
+    /* Overlays never eat pointer events: the map underneath stays inspectable. */
+    pointer-events: none;
+}
+
+/* MapLibre's attribution stays legible but out of the way. */
+.maplibregl-ctrl-bottom-right {
+    margin-bottom: 34px;
+}
+
+/* ---------------- opening ---------------- */
+
+/* White veil over the left column so national stipple never fights the type. */
+.scrim {
+    inset: 0;
+    width: 56%;
+    background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0.97) 0%,
+    rgba(255, 255, 255, 0.9) 45%,
+    rgba(255, 255, 255, 0) 100%);
+}
+
+.kicker {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font: 700 17px/1 var(--sans);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.kicker .rule {
+    display: block;
+    width: 46px;
+    height: 3px;
+    background: var(--ink);
+}
+
+.open-title {
+    left: var(--story-x);
+    top: 150px;
+    width: var(--story-w);
+}
+
+/* Masked line box: the headline rises into view instead of fading in. */
+.line-mask {
+    overflow: hidden;
+    height: 96px;
+}
+
+.open-title .line-mask:first-of-type {
+    margin-top: 18px;
+}
+
+.line {
+    font: 400 84px/1.14 var(--serif);
+    letter-spacing: -0.02em;
+    color: var(--ink);
+}
+
+.counter {
+    left: var(--story-x);
+    width: var(--story-w);
+    font-family: var(--sans);
+}
+
+.counter-value {
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}
+
+.counter-label {
+    margin-top: 8px;
+    font-weight: 500;
+    color: var(--muted);
+}
+
+/* ---------------- race shares ---------------- */
+
+.shares {
+    left: var(--story-x);
+    top: 262px;
+    width: var(--story-w);
+    font-family: var(--sans);
+}
+
+.shares-title {
+    margin-bottom: 22px;
+    font: 400 38px/1.2 var(--serif);
+    color: var(--ink);
+}
+
+.share-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 46px;
+}
+
+.share-swatch {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+}
+
+.share-label {
+    flex: 0 0 116px;
+    font-size: 21px;
+    font-weight: 500;
+    color: var(--ink);
+}
+
+.share-track {
+    flex: 0 0 300px;
+    height: 12px;
+    border-radius: 6px;
+    background: rgba(32, 34, 36, 0.07);
+    overflow: hidden;
+}
+
+.share-fill {
+    display: block;
+    height: 100%;
+    border-radius: 6px;
+}
+
+.share-pct {
+    width: 84px;
+    font-size: 21px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: var(--ink);
+}
+
+.shares-foot {
+    margin-top: 18px;
+    font-size: 19px;
+    font-weight: 500;
+    color: var(--muted);
+}
+
+.solo {
+    left: var(--story-x);
+    top: 606px;
+    width: var(--story-w);
+    font-family: var(--sans);
+}
+
+.solo-name {
+    font: 400 56px/1.1 var(--serif);
+    letter-spacing: -0.02em;
+}
+
+.solo-count {
+    margin-top: 6px;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.solo-note {
+    margin-top: 14px;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--muted);
+}
+
+/* ---------------- product chrome ---------------- */
+
+/* Same floating white card as .intro-card in index.html. */
+.panel {
+    left: calc(22px * var(--ui));
+    top: calc(22px * var(--ui));
+    width: calc(392px * var(--ui));
+    padding: calc(20px * var(--ui)) calc(22px * var(--ui)) calc(16px * var(--ui));
+    border-radius: calc(16px * var(--ui));
+    background: #fff;
+    box-shadow: var(--shadow);
+    color: var(--ink);
+    font-family: var(--sans);
+}
+
+.panel-title {
+    margin: 0;
+    font: 400 calc(23px * var(--ui)) /1.15 var(--serif);
+    letter-spacing: -0.01em;
+}
+
+.dot-scale {
+    margin: calc(5px * var(--ui)) 0 0;
+    font: 600 calc(15px * var(--ui)) /1.4 var(--sans);
+}
+
+.switcher {
+    position: relative;
+    display: flex;
+    gap: calc(4px * var(--ui));
+    margin-top: calc(14px * var(--ui));
+    padding: calc(3px * var(--ui));
+    border-radius: calc(9px * var(--ui));
+    background: var(--track);
+}
+
+/* The white chip slides between the three slots; promo.js sets its left. */
+.switcher-chip {
+    position: absolute;
+    top: calc(3px * var(--ui));
+    height: calc(100% - 6px * var(--ui));
+    border-radius: calc(7px * var(--ui));
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.switcher-slot {
+    position: relative;
+    /* Equal slots, like the product's flex:1 buttons, so the sliding chip can be
+       measured from the laid-out elements. */
+    flex: 1;
+    min-width: 0;
+    padding: calc(7px * var(--ui)) 0;
+    text-align: center;
+    font: 600 calc(12px * var(--ui)) /1 var(--sans);
+    color: var(--muted);
+}
+
+.switcher-slot.is-active {
+    color: var(--ink);
+}
+
+.explainer {
+    margin: calc(12px * var(--ui)) 0 0;
+    font: 400 calc(12.5px * var(--ui)) /1.5 var(--sans);
+    color: var(--muted);
+}
+
+.legend-scope {
+    margin: calc(12px * var(--ui)) 0 calc(6px * var(--ui));
+    font: 600 calc(11px * var(--ui)) /1.3 var(--sans);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.legend-row {
+    display: flex;
+    align-items: center;
+    gap: calc(9px * var(--ui));
+    height: calc(24px * var(--ui));
+    border-bottom: 1px solid var(--hairline);
+}
+
+.legend-swatch {
+    flex: 0 0 calc(12px * var(--ui));
+    width: calc(12px * var(--ui));
+    height: calc(12px * var(--ui));
+    border-radius: calc(3px * var(--ui));
+}
+
+.legend-label {
+    flex: 1;
+    font-size: calc(13px * var(--ui));
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.legend-pct {
+    font-size: calc(13px * var(--ui));
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+}
+
+.search {
+    left: calc(22px * var(--ui) + 392px * var(--ui) + 12px * var(--ui));
+    top: calc(22px * var(--ui));
+    display: flex;
+    align-items: center;
+    gap: calc(10px * var(--ui));
+    width: calc(320px * var(--ui));
+    height: calc(44px * var(--ui));
+    padding: 0 calc(16px * var(--ui));
+    border-radius: calc(22px * var(--ui));
+    background: #fff;
+    box-shadow: var(--shadow);
+    font-family: var(--sans);
+    font-size: calc(14px * var(--ui));
+    color: var(--muted);
+}
+
+.search svg {
+    flex: 0 0 calc(17px * var(--ui));
+    width: calc(17px * var(--ui));
+    height: calc(17px * var(--ui));
+}
+
+.footer {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: calc(32px * var(--ui));
+    padding: 0 calc(16px * var(--ui));
+    background: rgba(255, 255, 255, 0.86);
+    font: 400 calc(11.5px * var(--ui)) /1.4 var(--sans);
+    color: var(--muted);
+}
+
+.fly-caption {
+    left: 50%;
+    bottom: 92px;
+    padding: 12px 26px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: var(--card-shadow);
+    font: 600 22px/1 var(--sans);
+    color: var(--ink);
+    white-space: nowrap;
+}
+
+.fly-caption b {
+    color: var(--muted);
+}
+
+.place-pill {
+    left: 50%;
+    bottom: 64px;
+    padding: 9px 18px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: var(--card-shadow);
+    font: 600 16px/1 var(--sans);
+    color: var(--ink);
+    white-space: nowrap;
+}
+
+/* ---------------- pointer + stats popup ---------------- */
+
+.pointer {
+    width: 30px;
+    height: 30px;
+    transform-origin: top left;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.ripple {
+    width: 120px;
+    height: 120px;
+    margin: -60px 0 0 -60px;
+    border: 3px solid rgba(32, 33, 36, 0.55);
+    border-radius: 50%;
+}
+
+/* Same popup the live map shows on hover: title, one row per group, italic total. */
+.stats-card {
+    width: calc(230px * var(--ui));
+    padding: calc(12px * var(--ui)) calc(14px * var(--ui)) calc(10px * var(--ui));
+    border-radius: calc(10px * var(--ui));
+    background: #fff;
+    box-shadow: var(--card-shadow);
+    font-family: var(--sans);
+    font-size: calc(12px * var(--ui));
+    color: var(--ink);
+    transform-origin: top left;
+}
+
+.stats-title {
+    margin-bottom: calc(7px * var(--ui));
+    font-weight: 700;
+    font-size: calc(14px * var(--ui));
+}
+
+.stats-row {
+    display: flex;
+    align-items: center;
+    gap: calc(7px * var(--ui));
+    padding: calc(2.5px * var(--ui)) 0;
+    border-bottom: 1px solid #eee;
+}
+
+.stats-row i {
+    flex: 0 0 calc(8px * var(--ui));
+    width: calc(8px * var(--ui));
+    height: calc(8px * var(--ui));
+    border-radius: calc(2px * var(--ui));
+}
+
+.stats-row span:first-of-type {
+    flex: 1;
+}
+
+.stats-row b {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.stats-total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: calc(6px * var(--ui));
+    font-style: italic;
+    color: #666;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------------- payoff cards ---------------- */
+
+.insight {
+    right: 96px;
+    bottom: 118px;
+    width: 620px;
+    padding: 30px 34px 32px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: var(--card-shadow);
+    font-family: var(--sans);
+}
+
+.insight .kicker {
+    margin-bottom: 16px;
+    font-size: 15px;
+}
+
+.insight .rule {
+    width: 34px;
+}
+
+.insight-title {
+    font: 400 40px/1.16 var(--serif);
+    letter-spacing: -0.01em;
+    color: var(--ink);
+}
+
+.insight-note {
+    margin-top: 20px;
+    font-size: 19px;
+    line-height: 1.45;
+    color: var(--muted);
+}
+
+.insight-note b {
+    color: var(--ink);
+}
+
+.ends {
+    display: flex;
+    align-items: flex-end;
+    gap: 26px;
+    margin-top: 24px;
+}
+
+.end {
+    flex: 1;
+}
+
+.end-bar {
+    display: block;
+    height: 10px;
+    margin-bottom: 12px;
+    border-radius: 5px;
+}
+
+.end-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.end-value {
+    font-size: 46px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}
+
+.end-ratio {
+    padding-bottom: 6px;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.religion-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 52px;
+}
+
+.religion-row i {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.religion-row .name {
+    flex: 0 0 186px;
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.religion-row .track {
+    flex: 1;
+    height: 12px;
+    border-radius: 6px;
+    background: rgba(32, 34, 36, 0.07);
+    overflow: hidden;
+}
+
+.religion-row .fill {
+    display: block;
+    height: 100%;
+    border-radius: 6px;
+}
+
+.religion-row .pct {
+    width: 96px;
+    font-size: 24px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: var(--ink);
+}
+
+/* ---------------- sign-off ---------------- */
+
+/* The map stays underneath, veiled rather than cut — the product is the map. */
+.end-card {
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.end-dots {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.end-dots i {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.end-wordmark-mask {
+    height: 150px;
+}
+
+.end-wordmark {
+    font: 400 138px/1.05 var(--serif);
+    letter-spacing: -0.035em;
+    color: var(--ink);
+}
+
+.end-tagline {
+    margin-top: 10px;
+    font: 500 30px/1 var(--sans);
+    color: var(--ink);
+}
+
+.end-url {
+    margin-top: 26px;
+    font: 600 24px/1 var(--sans);
+    letter-spacing: 0.02em;
+    color: var(--ink);
+}
+
+.end-credit {
+    margin-top: 14px;
+    font: 500 17px/1 var(--sans);
+    color: var(--muted);
+}

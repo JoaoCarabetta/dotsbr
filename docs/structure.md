@@ -26,9 +26,10 @@ dotmap/
 │   └── events.js             # Empty placeholder
 ├── scripts/
 │   ├── ibge_uf.py                # UF codes, IBGE download, hover merge + tiles
-│   ├── themes.py                 # Race/income/deaths fields, sources, units and density scales
+│   ├── themes.py                 # Race/income/deaths/religion fields, sources, units and density scales
 │   ├── build_municipality.py     # Themed CSV + municipal malha → hover GeoJSON
 │   ├── build_census_tract.py     # Themed CSV + setor malha → detailed GeoJSON
+│   ├── build_religion_apond.py   # Sample P0410 × P0111 → APOND CSV + dasymetric setor + hover (drops water leftovers)
 │   ├── build_density_clusters.py # Themed adjacent setores → cluster_{UF}_z3…z6.geojson
 │   ├── serve.py                  # Static server with HTTP Range for PMTiles
 │   ├── build_theme_uf.sh         # One UF × theme: GeoJSON, clusters, tiles
@@ -39,12 +40,16 @@ dotmap/
 ├── docs/
 │   ├── docs.md               # Zoom, density, schema, one-panel + mobile sheet chrome, footer
 │   ├── fontes.md             # IBGE download URLs and raw-file caveats
+│   ├── dicionario-microdados.md  # Sample microdata (controlled): grain, weights, all variables
+│   ├── dicionario-microdados.csv # Same catalog, one row per variable
 │   ├── local-setup.md        # How to merge tiles and serve locally
 │   ├── deploy.md             # CI and the public /dotsbr/ path
 │   ├── user-analytics.md     # Umami (pageviews + view_switch / share); not GA
+│   ├── video.md              # Remotion promo example (not the live map)
 │   └── structure.md          # This file
+├── video/                    # Remotion 4 example (`Dotsbr`); npm, not the map server
 ├── assets/                   # Optional extras (not in git; unused by the current UI)
-├── tiles/                    # race MBTiles versioned as tiles/{UF}; income/deaths built locally
+├── tiles/                    # race MBTiles versioned as tiles/{UF}; income/deaths/religion built locally
 └── data/                     # gitignored: merged PMTiles, GeoJSON, raw census
 ```
 
@@ -56,4 +61,5 @@ mkdir -p data/tiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022.pmtiles tiles/*/*/tiles.mbtiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_income.pmtiles tiles/income/*/*/tiles.mbtiles
 tile-join -f --no-tile-size-limit -o data/tiles/censo2022_deaths.pmtiles tiles/deaths/*/*/tiles.mbtiles
+tile-join -f --no-tile-size-limit -o data/tiles/censo2022_religion.pmtiles tiles/religion/*/*/tiles.mbtiles
 ```

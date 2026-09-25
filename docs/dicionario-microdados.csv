@@ -1,0 +1,331 @@
+registro;codigo;nome;tipo;grupo;categorias;no_csv;no_layout
+Domicilios;D0010;Grande Região;C;geografia;1- Região Norte (uf=11 a 17) | 2- Região Nordeste (uf=21 a 29) | 3- Região Sudeste (uf=31 a 33 e 35) | 4- Região Sul (uf=41 a 43) | 5- Região Centro-oeste (uf=50 a 53);sim;sim
+Domicilios;D0020;Unidade da Federação;A;geografia;11- Rondônia | 12- Acre | 13- Amazonas | 14- Roraima | 15- Pará | 16- Amapá | 17- Tocantins | 21- Maranhão | 22- Piauí | 23- Ceará | 24- Rio Grande do Norte | 25- Paraíba | 26- Pernambuco | 27- Alagoas | 28- Sergipe | 29- Bahia | 31- Minas Gerais | 32- Espírito Santo | 33- Rio de Janeiro | 35- São Paulo | 41- Paraná | 42- Santa Catarina | 43- Rio Grande do Sul | 50- Mato Grosso do Sul | 51- Mato Grosso | 52- Goiás | 53- Distrito Federal;sim;sim
+Domicilios;D0030;Mesorregião;A;geografia;;sim;sim
+Domicilios;D0040;Microrregião;A;geografia;;sim;sim
+Domicilios;D0050;Região Geográfica Intermediária;A;geografia;;sim;sim
+Domicilios;D0060;Região Geográfica Imediata;A;geografia;;sim;sim
+Domicilios;D0070;Concentração urbana;A;geografia;;sim;sim
+Domicilios;D0080;Município;A;geografia;;sim;sim
+Domicilios;D0090;Área de Ponderação;A;geografia;;sim;sim
+Domicilios;D0100;Controle;N;identificação;;sim;sim
+Domicilios;D0111;Peso Amostral (Versão acesso Controlado);N (dec=13);peso;;sim;sim
+Domicilios;D0120;Situação do Setor;C;contexto do domicílio;01  - Área urbana de alta densidade de edificações | 02  - Área urbana de baixa densidade de edificações | 03  - Núcleo urbano | 05  - Povoado | 06  - Núcleo rural | 07  - Lugarejo | 08  - Área rural (exclusive aglomerados);sim;sim
+Domicilios;D0130;Espécie da unidade visitada;C;contexto do domicílio;01  - Domicílio particular permanente ocupado | 05  - Domicílio particular improvisado ocupado | 06  - Domicílio coletivo com morador;sim;sim
+Domicilios;D0140;Situação do domicílio;C;contexto do domicílio;1  - Urbana | 2  - Rural;sim;sim
+Domicilios;D0150;Moradores do domicílio, número;N;moradores e responsável;;sim;sim
+Domicilios;D0160;Crianças do domicílio, número;N;moradores e responsável;;sim;sim
+Domicilios;D0170;Sexo do morador responsável pelo domicílio;C;moradores e responsável;1  - Masculino | 2  - Feminino | 9 - Ignorado;sim;sim
+Domicilios;D0171;Sexo do morador responsável pelo domicílio;C;moradores e responsável;1  - Masculino | 2  - Feminino;sim;sim
+Domicilios;D0180;Idade da pessoa responsável pelo domicílio, categoria;C;moradores e responsável;01 - 0 a 4 anos | 02 - 5 a 9 anos | 03 - 10 a 14 anos | 04 - 15 a 19 anos | 05 - 20 a 24 anos | 06 - 25 a 29 anos | 07 - 30 a 34 anos | 08 - 35 a 39 anos | 09 - 40 a 44 anos | 10 - 45 a 49 anos | 11 - 50 a 54 anos | 12 - 55 a 59 anos | 13 - 60 a 64 anos | 14 - 65 a 69 anos | 15 - 70 a 74 anos | 16 - 75 a 79 anos | 17 - 80 anos ou mais | 99 - Ignorado;sim;sim
+Domicilios;D0181;Idade da pessoa responsável pelo domicílio;N;moradores e responsável;;sim;sim
+Domicilios;D0190;Condição de ocupação do domicílio, categoria;C;características do domicílio;1  - Próprio de algum morador Já pago, herdado ou ganho | 2  - Próprio de algum morador Ainda pagando | 3  - Alugado | 4  - Cedido ou emprestado Por empregador | 5  - Cedido ou emprestado Por familiar | 6  - Cedido ou emprestado Outra forma | 7  - Outra condição | Branco;sim;sim
+Domicilios;D0200;Tipo de espécie;C;características do domicílio;11 - (Permanente ocupada) Casa | 12 - (Permanente ocupada) Casa de vila ou em condomínio | 13 - (Permanente ocupada) Apartamento | 14 - (Permanente ocupada) Habitação em casa de cômodos ou cortiço | 15 - (Permanente ocupada) Habitação indígena sem paredes ou maloca | 16 - (Permanente ocupada) Estrutura residencial permanente degradada ou inacabada | 51 - (Improvisado ocupada) Tenda ou barraca de lona, plástico ou Tecido ou estrutura improvisada em logradouro público | 52 - (Improvisado ocupada) Dentro de estabelecimento em Funcionamento | 53 - (Improvisado ocupada) Estrutura não residencial permanente degradada ou inacabada | 54 - (Improvisado ocupada) Outros (veículos, abrigos naturais e outras estruturas improvisadas) | 61 - (Coletivo com morador) Asilo ou outra instituição de longa permanência para idosos | 62 - (Coletivo com morador) Hotel ou pensão | 63 - (Coletivo com morador) Alojamento | 64 - (Coletivo com morador) Penitenciária, Centro de Detenção e similar | 65 - (Coletivo com morador) Abrigo, albergue, casa de passagem, Clínica psiquiátrica, comunidade terapêutica, orfanato e similares | 66 - (Coletivo com morador) Outro;sim;sim
+Domicilios;D0210;Material das paredes do domicílio, categoria;C;características do domicílio;1  - Alvenaria ou taipa COM revestimento | 2  - Alvenaria SEM revestimento | 3  - Taipa sem revestimento | 4  - Madeira para construção | 5  - Madeira aproveitada de tapume, embalagens, andaimes | 6  - Outro material | 7  - Sem parede | Branco;sim;sim
+Domicilios;D0220;Cômodos no domicílio, número;N;características do domicílio;;sim;sim
+Domicilios;D0230;Cômodos servindo de dormitório no domicílio, número;N;características do domicílio;;sim;sim
+Domicilios;D0240;Número de moradores por cômodo utilizado como dormitório;N (dec=2);características do domicílio;;sim;sim
+Domicilios;D0250;Tipo de esgotamento sanitário do domicílio;C;características do domicílio;1 - Rede geral ou pluvial | 2 - Fossa séptica ou fossa filtro Ligada à rede | 3 - Fossa séptica ou fossa filtro Não ligada à rede | 4 - Fossa rudimentar ou buraco | 5 - Vala | 6 - Rio, lago, córrego ou mar | 7 - Outra forma | 9 - Não tem banheiro nem sanitário | Branco;sim;sim
+Domicilios;D0260;Abastecimento de água do domicílio, categoria;C;características do domicílio;1  - Rede geral de distribuição | 2  - Poço  Profundo ou artesiano | 3  - Poço  Raso, freático ou cacimba | 4  - Fonte, nascente ou mina | 5  - Carro-pipa | 6  - Água da chuva armazenada | 7  - Rios, açudes, córregos, lagos e igarapés | 8  - Outra | Branco;sim;sim
+Domicilios;D0270;Existência de banheiro ou sanitário e número de banheiros de uso exclusivo do domicílio;C;características do domicílio;1 - Tem banheiro de uso exclusivo do domicílio - 1 banheiro | 2 - Tem banheiro de uso exclusivo do domicílio - 2 banheiros | 3 - Tem banheiro de uso exclusivo do domicílio - 3 banheiros | 4 - Tem banheiro de uso exclusivo do domicílio - 4 banheiros ou mais | 5 - Apenas banheiro de uso comum a mais de um domicílio | 6 - Apenas sanitário ou buraco para dejeções, inclusive os localizados no terreno | 7 - Não tem banheiro nem sanitário | Branco;sim;sim
+Domicilios;D0280;Banheiros de uso exclusivo com chuveiro e vaso sanitário no domicílio, inclusive os localizados no terreno, número;N;características do domicílio;;sim;sim
+Domicilios;D0290;Acesso à rede geral de distribuição de água do domicílio, categoria;C;características do domicílio;1  - Sim | 2  - Não | Branco;sim;sim
+Domicilios;D0300;Existência de água canalizada do domicílio, categoria;C;características do domicílio;1  - Encanada até dentro da casa, apartamento ou habitação | 2  - Encanada, mas apenas no terreno | 3  - Não chega encanada | Branco;sim;sim
+Domicilios;D0310;Destino do lixo do domicílio, categoria;C;características do domicílio;1  - Coletado no domicílio por serviço de limpeza | 2  - Depositado em caçamba de serviço de limpeza | 3  - Queimado na propriedade | 4  - Enterrado na propriedade | 5  - Jogado em terreno baldio, encosta ou área pública | 6  - Outro destino | Branco;sim;sim
+Domicilios;D0320;Existência de máquina de lavar roupa no domicílio, categoria;C;características do domicílio;1  - Sim | 2  - Não | Branco;sim;sim
+Domicilios;D0330;Acesso à internet, existência;C;características do domicílio;1  - Sim | 2  - Não | Branco;sim;sim
+Domicilios;D0340;Ocorrência de óbito de morador do domicílio (de janeiro de 2019 a julho de 2022), categoria;C;óbito no domicílio;1  - Sim | 2  - Não | 9 - Ignorado | Branco;sim;sim
+Domicilios;D0350;Rendimento domiciliar;N;rendimento;;sim;sim
+Domicilios;D0360;Rendimento domiciliar per capita;N (dec=2);rendimento;;sim;sim
+Domicilios;D0370;Total de homens no domicílio;N;composição e deficiência;;sim;sim
+Domicilios;D0380;Total de mulheres no domicílio;N;composição e deficiência;;sim;sim
+Domicilios;D0390;Total de moradores com deficiência no domicílio;N;composição e deficiência;;sim;sim
+Domicilios;D0400;Total de moradores adultos com deficiência no domicílio;N;composição e deficiência;;sim;sim
+Domicilios;D0410;Total de moradores crianças com deficiência no domicílio;N;composição e deficiência;;sim;sim
+Domicilios;MD0130;MARCA DE IMPUTAÇÃO NA D0130;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Domicilios;MD0150;MARCA DE IMPUTAÇÃO NA D0150;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Domicilios;MD0160;MARCA DE IMPUTAÇÃO NA D0160;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Domicilios;MD0170;MARCA DE IMPUTAÇÃO NA D0170;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Domicilios;MD0180;MARCA DE IMPUTAÇÃO NA D0180;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Domicilios;MD0190;MARCA DE IMPUTAÇÃO NA D0190;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0200;MARCA DE IMPUTAÇÃO NA D0200;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Domicilios;MD0210;MARCA DE IMPUTAÇÃO NA D0210;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0220;MARCA DE IMPUTAÇÃO NA D0220;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0230;MARCA DE IMPUTAÇÃO NA D0230;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0240;MARCA DE IMPUTAÇÃO NA D0240;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0250;MARCA DE IMPUTAÇÃO NA D0250;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0260;MARCA DE IMPUTAÇÃO NA D0260;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0270;MARCA DE IMPUTAÇÃO NA D0270;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0280;MARCA DE IMPUTAÇÃO NA D0280;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0290;MARCA DE IMPUTAÇÃO NA D0290;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0300;MARCA DE IMPUTAÇÃO NA D0300;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0310;MARCA DE IMPUTAÇÃO NA D0310;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0320;MARCA DE IMPUTAÇÃO NA D0320;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0330;MARCA DE IMPUTAÇÃO NA D0330;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Domicilios;MD0340;MARCA DE IMPUTAÇÃO NA D0340;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;P0010;Grande Região;C;geografia;1- Região Norte (uf=11 a 17) | 2- Região Nordeste (uf=21 a 29) | 3- Região Sudeste (uf=31 a 33 e 35) | 4- Região Sul (uf=41 a 43) | 5- Região Centro-oeste (uf=50 a 53);sim;sim
+Pessoas;P0020;Unidade da Federação;A;geografia;11- Rondônia | 12- Acre | 13- Amazonas | 14- Roraima | 15- Pará | 16- Amapá | 17- Tocantins | 21- Maranhão | 22- Piauí | 23- Ceará | 24- Rio Grande do Norte | 25- Paraíba | 26- Pernambuco | 27- Alagoas | 28- Sergipe | 29- Bahia | 31- Minas Gerais | 32- Espírito Santo | 33- Rio de Janeiro | 35- São Paulo | 41- Paraná | 42- Santa Catarina | 43- Rio Grande do Sul | 50- Mato Grosso do Sul | 51- Mato Grosso | 52- Goiás | 53- Distrito Federal;sim;sim
+Pessoas;P0030;Mesorregião;A;geografia;;sim;sim
+Pessoas;P0040;Microrregião;A;geografia;;sim;sim
+Pessoas;P0050;Região Geográfica Intermediária;A;geografia;;sim;sim
+Pessoas;P0060;Região Geográfica Imediata;A;geografia;;sim;sim
+Pessoas;P0070;Concentração urbana;A;geografia;;sim;sim
+Pessoas;P0080;Município;A;geografia;;sim;sim
+Pessoas;P0090;Área de Ponderação;A;geografia;;sim;sim
+Pessoas;P0100;Controle;N;identificação;;sim;sim
+Pessoas;P0101;Número de ordem do morador;N;identificação;;sim;sim
+Pessoas;P0111;Peso Amostral (Versão acesso Controlado);N (dec=13);peso;;sim;sim
+Pessoas;P0120;Situação do Setor;C;contexto do domicílio;01  - Área urbana de alta densidade de edificações | 02  - Área urbana de baixa densidade de edificações | 03  - Núcleo urbano | 05  - Povoado | 06  - Núcleo rural | 07  - Lugarejo | 08  - Área rural (exclusive aglomerados);sim;sim
+Pessoas;P0130;Espécie da unidade visitada;C;contexto do domicílio;01  - Domicílio particular permanente ocupado | 05  - Domicílio particular improvisado ocupado | 06  - Domicílio coletivo com morador;sim;sim
+Pessoas;P0140;Situação do domicílio;C;contexto do domicílio;1  - Urbana | 2  - Rural;sim;sim
+Pessoas;P0150;Sexo;C;sexo, idade e condição no domicílio;1  - Masculino | 2  - Feminino | 9 - Ignorado;sim;sim
+Pessoas;P0160;Sexo;C;sexo, idade e condição no domicílio;1  - Masculino | 2  - Feminino;sim;sim
+Pessoas;P0170;Condição no domicílio da pessoa, categoria;C;sexo, idade e condição no domicílio;01  - Pessoa responsável pelo domicílio | 02  - Cônjuge ou companheiro(a) de sexo diferente | 03  - Cônjuge ou companheiro(a) do mesmo sexo | 04  - Filho(a) do responsável e do cônjuge | 05  - Filho(a) somente do responsável | 06  - Enteado(a) | 07  - Genro ou nora | 08  - Pai, mãe, padrasto ou madrasta | 09  - Sogro(a) | 10  - Neto(a) | 11  - Bisneto(a) | 12  - Irmão ou irmã | 13  - Avô ou avó | 14  - Outro parente | 15  - Agregado(a) | 16  - Convivente | 17  - Pensionista | 18  - Empregado(a) doméstico(a) | 19  - Parente do(a) empregado(a)  doméstico(a) | 20  - Individual em domicílio coletivo;sim;sim
+Pessoas;P0180;Idade calculada em anos da pessoa, categoria;C;sexo, idade e condição no domicílio;01 - 0 a 4 anos | 02 - 5 a 9 anos | 03 - 10 a 14 anos | 04 - 15 a 19 anos | 05 - 20 a 24 anos | 06 - 25 a 29 anos | 07 - 30 a 34 anos | 08 - 35 a 39 anos | 09 - 40 a 44 anos | 10 - 45 a 49 anos | 11 - 50 a 54 anos | 12 - 55 a 59 anos | 13 - 60 a 64 anos | 14 - 65 a 69 anos | 15 - 70 a 74 anos | 16 - 75 a 79 anos | 17 - 80 anos ou mais | 99 - Ignorado;sim;sim
+Pessoas;P0181;Idade calculada em anos da pessoa, número;N;sexo, idade e condição no domicílio;;sim;sim
+Pessoas;P0190;Idade calculada em meses da pessoa, número;N;sexo, idade e condição no domicílio;;sim;sim
+Pessoas;P0200;Forma de declaração de idade;C;sexo, idade e condição no domicílio;1 - Data de nascimento | 2 - Idade declarada;sim;sim
+Pessoas;P0210;Cor ou raça da pessoa, categoria;C;raça, indígena, quilombola e registro;1  - Branca | 2  - Preta | 3  - Amarela | 4  - Parda | 5  - Indígena | 9 - Ignorado;sim;sim
+Pessoas;P0220;Pessoa Indígena, categoria;C;raça, indígena, quilombola e registro;1 - Sim | 0 - Não | 9 - Ignorado;sim;sim
+Pessoas;P0230;Uso da língua portuguesa no domicílio da pessoa, categoria.;C;raça, indígena, quilombola e registro;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0240;Status de declaração de etnia;C;raça, indígena, quilombola e registro;1 - Declarou uma etnia | 2 - Declarou duas etnias | 3 - Declaração não-determinada | 4 - Declaração mal definida | 5 - Não sabe | 6 - Não declarou | Branco;sim;sim
+Pessoas;P0250;Status de declaração de língua indígena;C;raça, indígena, quilombola e registro;1 - Declarou uma língua indígena | 2 - Declarou duas línguas indígenas | 3 - Declarou três línguas indígenas | 4 - Declaração não-determinada | 5 - Declaração mal definida | 6 - Não sabe | 7 - Não fala língua indígena no domicílio | Branco;sim;sim
+Pessoas;P0260;Pessoa quilombola, categoria;C;raça, indígena, quilombola e registro;1  - Sim | 2  - Não;sim;sim
+Pessoas;P0270;Existência e tipo de registro de nascimento da pessoa, categoria;C;raça, indígena, quilombola e registro;1  - Do cartório | 2  - Registro Administrativo de Nascimento Indígena (RANI) | 3  - Não tem | 4  - Não sabe | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0280;Convivência com cônjuge ou companheiro da pessoa, categoria;C;união, parentesco e fecundidade;1  - Sim | 2  - Não Já viveu antes | 3  - Não Nunca viveu | Branco;sim;sim
+Pessoas;P0290;Natureza da união, categoria;C;união, parentesco e fecundidade;1  - Casamento civil e religioso | 2  - Só casamento civil | 3  - Só casamento religioso | 4  - União consensual | Branco;sim;sim
+Pessoas;P0300;Moradia da mãe ou madrasta no domicílio da pessoa, categoria;C;união, parentesco e fecundidade;1  - Sim | 2  - Não;sim;sim
+Pessoas;P0310;Moradia do pai ou padrasto no domicílio da pessoa, categoria;C;união, parentesco e fecundidade;1  - Sim | 2  - Não;sim;sim
+Pessoas;P0320;Filhos homens nascidos vivos da pessoa, número;N;união, parentesco e fecundidade;;sim;sim
+Pessoas;P0330;Filhas mulheres nascidas vivas da pessoa, número;N;união, parentesco e fecundidade;;sim;sim
+Pessoas;P0340;Filhos nascidos vivos da pessoa, número;N;união, parentesco e fecundidade;;sim;sim
+Pessoas;P0350;Filhos homens vivos da pessoa, número;N;união, parentesco e fecundidade;;sim;sim
+Pessoas;P0360;Filhas mulheres vivas da pessoa, número;N;união, parentesco e fecundidade;;sim;sim
+Pessoas;P0370;Filhos vivos da pessoa, número;N;união, parentesco e fecundidade;;sim;sim
+Pessoas;P0380;Idade calculada do último filho nascido vivo da pessoa, categoria;C;união, parentesco e fecundidade;01 - 0 a 4 anos | 02 - 5 a 9 anos | 03 - 10 a 14 anos | 04 - 15 a 19 anos | 05 - 20 a 24 anos | 06 - 25 a 29 anos | 07 - 30 a 34 anos | 08 - 35 a 39 anos | 09 - 40 a 44 anos | 10 - 45 a 49 anos | 11 - 50 a 54 anos | 12 - 55 a 59 anos | 13 - 60 a 64 anos | 14 - 65 a 69 anos | 15 - 70 a 74 anos | 16 - 75 a 79 anos | 17 - 80 anos ou mais | 99 - Ignorado;sim;sim
+Pessoas;P0381;Idade calculada do último filho nascido vivo da pessoa, número;N;união, parentesco e fecundidade;;sim;sim
+Pessoas;P0390;Forma de declaração de idade do último filho tido nascido vivo;C;união, parentesco e fecundidade;1 - Data de nascimento | 2 - Idade declarada | Branco;sim;sim
+Pessoas;P0400;Existência de filho nascido vivo no período de 12 meses, categoria;C;união, parentesco e fecundidade;1  - Sim | 2  - Não | Branco;sim;sim
+Pessoas;P0410;Religião ou culto, categoria;A;religião;1 - Católica Apostólica Romana | 2 - Evangélicas | 3 - Espírita | 4 - Umbanda e Candomblé | 5 - Tradições indígenas | 6 - Outras religiosidades | 7 - Sem religião | 8 - Não sabe | 9 - Sem declaração;sim;sim
+Pessoas;P0411;Religião ou culto, categoria;A;religião;1 - Católica Apostólica Romana | 2 - Católica Apostólica Brasileira | 3 - Católica Ortodoxa | 4 - Evangélicas de Missão | 5 - Evangélicas de origem pentecostal | 6 - Igrejas evangélicas indígenas | 7 - Evangélica não determinada | 8 - Outras religiosidades cristãs | 9 - Igreja de Jesus Cristo dos Santos dos Últimos Dias | 10 - Testemunhas de Jeová | 11 - Espiritualista | 12 - Espírita | 13 - Umbanda | 14 - Candomblé | 15 - Outras declarações de religiosidades afrobrasileira | 16 - Judaísmo | 17 - Hinduísmo | 18 - Budismo | 19 - Igreja Messiânica Mundial | 20 - Outras novas religiões orientais | 21 - Outras religiões orientais | 22 - Islamismo | 23 - Tradições esotéricas | 24 - Tradições indígenas | 25 - Religiões Ayahuasqueiras | 26 - LBV | 27 - Sem religião - Sem religião | 28 - Sem religião - Ateu | 29 - Sem religião - Agnóstico | 30 - Múltiplo pertencimento | 31 - Não determinada | 32 - Não sabe | 33 - Sem declaração;sim;sim
+Pessoas;P0420;Existência de deficiência visual da pessoa, categoria;C;deficiência e autismo;1  - Tem, não consegue de modo algum | 2  - Tem muita dificuldade | 3  - Tem alguma dificuldade | 4  - Não tem dificuldade | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0430;Existência de deficiência auditiva da pessoa, categoria;C;deficiência e autismo;1  - Tem, não consegue de modo algum | 2  - Tem muita dificuldade | 3  - Tem alguma dificuldade | 4  - Não tem dificuldade | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0440;Existência de deficiência motora da pessoa, categoria;C;deficiência e autismo;1  - Tem, não consegue de modo algum | 2  - Tem muita dificuldade | 3  - Tem alguma dificuldade | 4  - Não tem dificuldade | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0450;Existência de dificuldade em pegar objetos da pessoa, categoria;C;deficiência e autismo;1  - Tem, não consegue de modo algum | 2  - Tem muita dificuldade | 3  - Tem alguma dificuldade | 4  - Não tem dificuldade | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0460;Existência de deficiência mental ou intelectual da pessoa, categoria;C;deficiência e autismo;1  - Tem, não consegue de modo algum | 2  - Tem muita dificuldade | 3  - Tem alguma dificuldade | 4  - Não tem dificuldade | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0470;Variável indicadora da Existência de Deficiência;C;deficiência e autismo;1 - Pessoa COM Deficiência | 2 - Pessoa SEM Deficiência | 9 - Não aplicável - Pessoa com menos de 2 anos de idade;sim;sim
+Pessoas;P0480;Local de nascimento da pessoa, categoria;C;migração e nascimento;1  - Neste município | 2  - Em outro município do Brasil | 3  - Em outro país | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0490;Unidade da Federação de nascimento da pessoa, código;A;migração e nascimento;;sim;sim
+Pessoas;P0500;Município de nascimento da pessoa, código;A;migração e nascimento;;sim;sim
+Pessoas;P0510;País de nascimento da pessoa, código;A;migração e nascimento;;sim;sim
+Pessoas;P0520;Nacionalidade da pessoa, categoria;C;migração e nascimento;1  - Brasileiro nato | 2  - Naturalizado brasileiro | 3  - Estrangeiro | Branco;sim;sim
+Pessoas;P0530;Moradia em outro município ou país estrangeiro da pessoa, categoria;C;migração e nascimento;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0540;Ano de fixação de residência da pessoa, número;N;migração e nascimento;;sim;sim
+Pessoas;P0550;Tempo de moradia no município da pessoa, número;N;migração e nascimento;;sim;sim
+Pessoas;P0560;Unidade da Federação e município ou país estrangeiro de moradia anterior da pessoa, categoria;C;migração e nascimento;1  - Estado/Município | 2  - País estrangeiro | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0570;Unidade da Federação de moradia anterior da pessoa, código;A;migração e nascimento;;sim;sim
+Pessoas;P0580;Município de moradia anterior da pessoa, código;A;migração e nascimento;;sim;sim
+Pessoas;P0590;País estrangeiro de moradia anterior da pessoa, código;A;migração e nascimento;;sim;sim
+Pessoas;P0600;Unidade da Federação e município ou país estrangeiro de moradia há 5 anos da pessoa, categoria;C;migração e nascimento;1  - Neste município | 2  - Outro município do Brasil | 3  - Outro país | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0610;Unidade da Federação de moradia há 5 anos da pessoa, código;A;migração e nascimento;;sim;sim
+Pessoas;P0620;Município de moradia da pessoa há 5 anos, código;A;migração e nascimento;;sim;sim
+Pessoas;P0630;País de moradia há 5 anos da pessoa, código;A;migração e nascimento;;sim;sim
+Pessoas;P0640;Alfabetização da pessoa, categoria;C;educação;1  - Sim | 2  - Não | Branco;sim;sim
+Pessoas;P0650;Frequência escolar da pessoa, categoria;C;educação;1  - Sim | 2  - Não Mas já frequentou | 3  - Não Nunca frequentou | Branco;sim;sim
+Pessoas;P0660;Curso frequentado pela pessoa, categoria;C;educação;01  - Creche | 02  - Pré escola | 03  - Alfabetização de jovens e adultos | 04  - Regular do ensino fundamental | 05  - Educação de jovens e adultos (EJA) do ensino fundamental | 06  - Regular do ensino médio | 07  - Educação de jovens e adultos (EJA) do ensino médio | 08  - Superior de graduação | 09  - Especialização de nível superior (duração mínima de 360 horas) | 10  - Mestrado | 11  - Doutorado | 99  - Ignorado | Branco;sim;sim
+Pessoas;P0670;Ano do curso frequentado pela pessoa, categoria;C;educação;01  - Primeiro | 02  - Segundo | 03  - Terceiro | 04  - Quarto | 05  - Quinto | 06  - Sexto | 07  - Sétimo | 08  - Oitavo | 09  - Nono | 10  - Curso não classificado em anos | 99  - Ignorado | Branco;sim;sim
+Pessoas;P0680;Série do curso frequentado pela pessoa, categoria;C;educação;01  - Primeira | 02  - Segunda | 03  - Terceira | 04  - Quarta | 05  - Quinta | 06  - Sexta | 07  - Sétima | 08  - Oitava | 09  - Nona | 10  - Curso não classificado em séries | 99  - Ignorado | Branco;sim;sim
+Pessoas;P0690;Conclusão de outro curso superior de graduação da pessoa, categoria;C;educação;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0700;Curso mais elevado frequentado anteriormente da pessoa, categoria;C;educação;01  - Creche | 02  - Pré escola | 03  - Classe de alfabetização | 04  - Alfabetização de jovens e adultos | 05  - Antigo primário (elementar) | 06  - Antigo ginasial (médio 1º ciclo) | 07  - Regular do ensino fundamental ou do 1º grau | 08  - Educação de jovens e adultos (EJA) do ensino fundamental ou supletivo do 1º grau | 09  - Antigo científico, clássico, etc. (médio 2º ciclo) | 10  - Regular do ensino médio ou do 2º grau | 11  - Educação de jovens e adultos (EJA) do ensino médio ou supletivo do 2º grau | 12  - Superior de graduação | 13  - Especialização de nível superior (duração mínima de 360 horas) | 14  - Mestrado | 15  - Doutorado | 99  - Ignorado | Branco;sim;sim
+Pessoas;P0710;Duração do curso frequentado anteriormente da pessoa, categoria;C;educação;1  - 8 séries | 2  - 9 anos | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0720;Último ano concluído com aprovação no curso frequentado anteriormente da pessoa, categoria;C;educação;01  - Nenhum | 02  - Primeiro | 03  - Segundo | 04  - Terceiro | 05  - Quarto | 06  - Quinto | 07  - Sexto | 08  - Sétimo | 09  - Oitavo | 10  - Nono | 11  - Curso não era classificado em anos | 99  - Ignorado | Branco;sim;sim
+Pessoas;P0730;Última série concluída com aprovação no curso frequentado anteriormente da pessoa, categoria;C;educação;01  - Nenhuma | 02  - Primeira | 03  - Segunda | 04  - Terceira | 05  - Quarta | 06  - Quinta | 07  - Sexta | 08  - Sétima | 09  - Oitava | 10  - Nona | 11  - Curso não classificado em séries | 99  - Ignorado | Branco;sim;sim
+Pessoas;P0740;Conclusão de curso frequentado anteriormente pela pessoa, categoria;C;educação;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0750;Área detalhada do curso superior de graduação cursado pela pessoa;A;educação;;sim;sim
+Pessoas;P0760;Morador, nível de instrução de ensino;C;educação;"1 - Sem instrução e menos de 1 ano | 2 - Ensino fundamental incompleto ou equivalente | 3 - Ensino fundamental completo ou equivalente | 4 - Ensino médio incompleto ou equivalente | 5 - Ensino médio completo ou equivalente | 6 - Superior incompleto ou equivalente | 7 - Superior completo | 8 - Não determinado | 9 - Ignorado ""se frequenta curso"" | 901 - Ignorado ""curso que frequenta"" | 902 - Ignorado ""ano/serie que frequenta | 903 - Ignorado ""se concluiu outro curso de graduação"" | 911 - Ignorado ""curso que frequentou"" | 912 - Ignorado ""se concluiu o curso que frequentou"" | 913 - Ignorado ""ano/série que frequentou"" | 914 - Ignorado ""duração do curso regular de Ensino Fundamental""";sim;sim
+Pessoas;P0770;Morador, nível de instrução de ensino, compatível com o Censo Demográfico de 2010;C;educação;1 - Sem instrução e fundamental incompleto | 2 - Fundamental completo e médio incompleto | 3 - Médio completo e superior incompleto | 4 - Superior completo | 5 - Não determinado;sim;sim
+Pessoas;P0780;Variável indicadora de frequência escolar em nível adequado à idade;C;educação;1 - Adequado | 2 - Não adequado | 9 - Não aplicável - Pessoa com menos de 6 anos ou maior que 24 anos de idade;sim;sim
+Pessoas;P0790;Anos de estudo da pessoa;N;educação;;sim;sim
+Pessoas;P0800;Unidade da Federação e município ou país estrangeiro da escola da pessoa, categoria;C;educação;1  - Neste município | 2  - Em outro município do Brasil | 3  - Em outro país | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0810;Unidade da Federação do local de estudo da pessoa, categoria;A;educação;;sim;sim
+Pessoas;P0820;Município do local de estudo da pessoa, categoria;A;educação;;sim;sim
+Pessoas;P0830;País estrangeiro do local de estudo da pessoa, categoria;A;educação;;sim;sim
+Pessoas;P0840;Existência de trabalho remunerado em dinheiro da pessoa, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0850;Existência de trabalho remunerado em produtos, mercadorias ou benefícios da pessoa, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0860;Existência de bico ou atividade ocasional remunerada da pessoa, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0870;Existência de trabalho não remunerado como ajuda na atividade remunerada de morador do domicílio da pessoa, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0880;Existência de afastamento temporário do trabalho remunerado da pessoa, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0890;Existência de trabalho na plantação, criação de animais ou pesca, para alimentação dos moradores do domicílio, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0900;Trabalhos da pessoa, categoria;C;trabalho, rendimento e deslocamento;1  - Um | 2  - Dois | 3  - Três ou mais | 9  - Ignorado | Branco;sim;sim
+Pessoas;P0910;Pessoa de 10 anos ou mais de idade, categoria;C;trabalho, rendimento e deslocamento;0 - Pessoa de menos de 10 anos de idade | 1 - Pessoa de 10 anos ou mais de idade | Branco;sim;sim
+Pessoas;P0920;Pessoa de 14 anos ou mais de idade, categoria;C;trabalho, rendimento e deslocamento;0 - Pessoa de menos de 14 anos de idade | 1 - Pessoa de 14 anos ou mais de idade | Branco;sim;sim
+Pessoas;P0930;Pessoa de 14 anos ou mais de idade na força de trabalho, categoria;C;trabalho, rendimento e deslocamento;0 - Pessoa de 14 anos ou mais de idade FORA da força de trabalho | 1 - Pessoa de 14 anos ou mais de idade na força de trabalho | Branco;sim;sim
+Pessoas;P0940;Pessoa de 14 anos ou mais, ocupada, contribuinte de instituto de previdência no trabalho principal, catogoria;C;trabalho, rendimento e deslocamento;0 - Pessoa de 14 anos ou mais de idade ocupada NÃO contribuinte de instituto de previdência no trabalho principal | 1 - Pessoa de 14 anos ou mais de idade ocupada contribuinte de instituto de previdência no trabalho principal | Branco;sim;sim
+Pessoas;P0950;Pessoas de 14 anos ou mais ocupada, categoria;C;trabalho, rendimento e deslocamento;0 - Desocupada | 1 - Ocupada | Branco;sim;sim
+Pessoas;P0960;Pessoas de 10 anos ou mais ocupada, categoria;C;trabalho, rendimento e deslocamento;0 - Não ocupada | 1 - Ocupada | Branco;sim;sim
+Pessoas;P0970;Ocupação – código:;A;trabalho, rendimento e deslocamento;- A relação de códigos encontra-se no arquivo: “Codificação_Ocupação CD2022.xls”;sim;sim
+Pessoas;P0980;Atividade – código;A;trabalho, rendimento e deslocamento;- A relação de códigos encontra-se no arquivo: “Codificação_Atividade CD2022.xls”;sim;sim
+Pessoas;P0990;Posição na ocupação do trabalho principal da pessoa, categoria;C;trabalho, rendimento e deslocamento;01  - Trabalhador doméstico (inclusive diarista) | 02  - Militar do exército, da marinha, da aeronáutica, da polícia militar ou do corpo de bombeiros militar | 03  - Empregado do setor privado | 04  - Empregado do setor público _ funcionário estatutário | 05  - Empregado do setor público _ empregado não estatutário | 06  - Empregado de empresas estatais | 07  - Empregador (com pelo menos um empregado) | 08  - Conta própria (sem empregados) | 09  - Trabalhador não remunerado em ajuda a morador do domicílio ou parente | 99  - Ignorado | Branco;sim;sim
+Pessoas;P1000;Existência de carteira de trabalho assinada no trabalho principal da pessoa, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P1010;Existência de registro no CNPJ do negócio ou empresa da pessoa, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não;sim;sim
+Pessoas;P1020;Posição na ocupação no trabalho principal, semana de referência, pessoas de 10 anos ou mais;C;trabalho, rendimento e deslocamento;01 - Empregado no setor privado COM carteira de trabalho assinada | 02 - Empregado no setor privado SEM carteira de trabalho assinada | 03 - Trabalhador doméstico COM carteira de trabalho assinada | 04 - Trabalhador doméstico SEM carteira de trabalho assinada | 05 -  Empregado no setor público COM carteira de trabalho assinada | 06 -  Empregado no setor público SEM carteira de trabalho assinada | 07 - Militar e servidor estatutário | 08 - Empregador | 09 - Conta própria | 10 - Trabalhador familiar auxiliar;sim;sim
+Pessoas;P1030;Atividade principal, no trabalho principal, semana de referência, pessoas de 10 anos ou mais;C;trabalho, rendimento e deslocamento;01 - Agricultura, pecuária, produção florestal, pesca e aquicultura | 02 - Indústrias extrativas | 03 - Indústrias de transformação | 04 - Eletricidade e gás | 05 - Água, esgoto, atividades de gestão de resíduos e descontaminação | 06 - Construção | 07 - Comércio, reparação de veículos automotores e motocicletas | 08 - Transporte, armazenagem e correio | 09 - Alojamento e alimentação | 10 - Informação e comunicação | 11 - Atividades financeiras, de seguros e serviços relacionados | 12 - Atividades imobiliárias | 13 - Atividades profissionais, científicas e técnicas | 14 - Atividades administrativas e serviços complementares | 15 - Administração pública, defesa e seguridade social | 16 - Educação | 17 - Saúde humana e serviços sociais | 18 - Artes, cultura, esporte e recreação | 19 - Outras atividades de serviços | 20 - Serviços domésticos | 21 - Organismos internacionais e outras instituições extraterritoriais | 22 - Atividades mal definidas ou não especificadas (biscate) | Branco;sim;sim
+Pessoas;P1040;Grandes Grupos Ocupacionais, trabalho principal, semana de referência, pessoas de 10 anos ou mais;C;trabalho, rendimento e deslocamento;01 - Diretores e gerentes | 02 - Profissionais das ciências e intelectuais | 03 - Técnicos e profissionais de nível médio | 04 - Trabalhadores de apoio administrativo | 05 - Trabalhadores dos serviços, vendedores dos comércios e mercados | 06 - Trabalhadores qualificados da agropecuária, florestais, da caça e da pesca | 07 - Trabalhadores qualificados, operários e artesões da construção, das artes mecânicas e outros ofícios | 08 - Operadores de instalações e máquinas e montadores | 09 - Ocupações elementares | 10 - Membros das forças armadas, policiais e bombeiros militares | 11 - Ocupações maldefinidas;sim;sim
+Pessoas;P1050;Existência de providência para conseguir trabalho no período de 30 dias da pessoa, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não | 9  - Ignorado;sim;sim
+Pessoas;P1060;Disponibilidade para começar a trabalhar da pessoa, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P1070;Tipo de rendimento bruto mensal habitualmente recebido em todos os trabalhos para pessoas de 10 anos ou mais;C;trabalho, rendimento e deslocamento;1  - Valor em dinheiro, produtos ou mercadorias | 2  - Outra forma (Moradia, Alimentação, Treinamento, etc.);sim;sim
+Pessoas;P1080;Valor do Rendimento bruto mensal habitual de todos os trabalhos para pessoas de 10 anos ou mais;N;trabalho, rendimento e deslocamento;;sim;sim
+Pessoas;P1090;Existência de rendimento bruto mensal, Aposentadoria/Pensão/Bolsa Família/BPC/Aluguel, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não | 9  - Ignorado;sim;sim
+Pessoas;P1100;Rendimento bruto mensal, Aposentadoria/Pensão/Bolsa Família/BPC/Aluguel, Valor;N;trabalho, rendimento e deslocamento;;sim;sim
+Pessoas;P1110;Rendimento recebido em todas as fontes;N;trabalho, rendimento e deslocamento;;sim;sim
+Pessoas;P1120;Unidade da Federação e município ou país estrangeiro do local de trabalho da pessoa, categoria;C;trabalho, rendimento e deslocamento;1  - Em casa ou na propriedade | 2  - Fora de casa e da propriedade | 3  - Em outro município do Brasil | 4  - Em outro país | 5  - Em mais de um município ou país | 9  - Ignorado | Branco;sim;sim
+Pessoas;P1130;Unidade da Federação do local de trabalho da pessoa, código;A;trabalho, rendimento e deslocamento;;sim;sim
+Pessoas;P1140;Município do local de trabalho da pessoa, código;A;trabalho, rendimento e deslocamento;;sim;sim
+Pessoas;P1150;País estrangeiro do local de trabalho da pessoa, categoria;A;trabalho, rendimento e deslocamento;;sim;sim
+Pessoas;P1160;Retorna do trabalho para casa 3 dias ou mais na semana, categoria;C;trabalho, rendimento e deslocamento;1  - Sim | 2  - Não | 9  - Ignorado | Branco;sim;sim
+Pessoas;P1170;Meios de transporte de deslocamento para o local de trabalho da pessoa, categoria;C;trabalho, rendimento e deslocamento;01  - A pé | 02  - Bicicleta | 03  - Motocicleta | 04  - Mototáxi | 05  - Automóvel | 06  - Táxi ou assemelhados | 07  - Van, perua ou assemelhados | 08  - Ônibus | 09  - BRT ou ônibus de trânsito rápido | 10  - Trem ou metrô | 11  - Caminhonete ou caminhão adaptado (pau de arara) | 12  - Embarcação de médio e grande porte (acima de 20 pessoas) | 13  - Embarcação de pequeno porte (até 20 pessoas) | 14  - Outros | 99 - Ignorado;sim;sim
+Pessoas;P1180;Tempo em que a pessoa leva entre sua casa e o local de trabalho normalmente, categoria;C;trabalho, rendimento e deslocamento;0 - Não se desloca para local de trabalho | 1 - Até cinco minutos | 2 - De seis minutos até quinze minutos | 3 - Mais de quinze minutos até meia hora | 4 - Mais de meia hora até uma hora | 5 - Mais de uma hora até duas horas | 6 - Mais de duas horas até quatro horas | 7 - Mais de quatro horas | 9 - Tempo não informado (ignorado);sim;sim
+Pessoas;P1190;Tempo do deslocamento para trabalho, calculado em minutos;N;trabalho, rendimento e deslocamento;;sim;sim
+Pessoas;P1200;Existência de diagnóstico de autismo por profissional de saúde;C;deficiência e autismo;1  - Sim | 2  - Não | Branco;sim;sim
+Pessoas;P1210;Quem prestou as informações da pessoa, categoria;C;informante;1  - A própria pessoa | 2  - Outro morador | 3  - Não morador | 9 - Ignorado | Branco;sim;sim
+Pessoas;P1220;Número de ordem de quem prestou as informações da pessoa, código;A;informante;;sim;sim
+Pessoas;MP0150;MARCA DE IMPUTAÇÃO NA P0150;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Pessoas;MP0170;MARCA DE IMPUTAÇÃO NA P0170;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Pessoas;MP0180;MARCA DE IMPUTAÇÃO NA P0180;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Pessoas;MP0181;MARCA DE IMPUTAÇÃO NA P0181;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Pessoas;MP0190;MARCA DE IMPUTAÇÃO NA P0190;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0210;MARCA DE IMPUTAÇÃO NA P0210;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Pessoas;MP0230;MARCA DE IMPUTAÇÃO NA P0230;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0260;MARCA DE IMPUTAÇÃO NA P0260;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0270;MARCA DE IMPUTAÇÃO NA P0270;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0280;MARCA DE IMPUTAÇÃO NA P0280;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0290;MARCA DE IMPUTAÇÃO NA P0290;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0300;MARCA DE IMPUTAÇÃO NA P0300;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Pessoas;MP0310;MARCA DE IMPUTAÇÃO NA P0310;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Pessoas;MP0320;MARCA DE IMPUTAÇÃO NA P0320;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0330;MARCA DE IMPUTAÇÃO NA P0330;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0350;MARCA DE IMPUTAÇÃO NA P0350;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0360;MARCA DE IMPUTAÇÃO NA P0360;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0410;MARCA DE IMPUTAÇÃO NA P0410;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0411;MARCA DE IMPUTAÇÃO NA P0411;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0420;MARCA DE IMPUTAÇÃO NA P0420;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0430;MARCA DE IMPUTAÇÃO NA P0430;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0440;MARCA DE IMPUTAÇÃO NA P0440;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0450;MARCA DE IMPUTAÇÃO NA P0450;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0460;MARCA DE IMPUTAÇÃO NA P0460;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0480;MARCA DE IMPUTAÇÃO NA P0480;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Pessoas;MP0490;MARCA DE IMPUTAÇÃO NA P0490;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0500;MARCA DE IMPUTAÇÃO NA P0500;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0510;MARCA DE IMPUTAÇÃO NA P0510;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0520;MARCA DE IMPUTAÇÃO NA P0520;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0530;MARCA DE IMPUTAÇÃO NA P0530;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0540;MARCA DE IMPUTAÇÃO NA P0540;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0550;MARCA DE IMPUTAÇÃO NA P0550;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0560;MARCA DE IMPUTAÇÃO NA P0560;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0570;MARCA DE IMPUTAÇÃO NA P0570;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0580;MARCA DE IMPUTAÇÃO NA P0580;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0590;MARCA DE IMPUTAÇÃO NA P0590;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0600;MARCA DE IMPUTAÇÃO NA P0600;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0610;MARCA DE IMPUTAÇÃO NA P0610;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0620;MARCA DE IMPUTAÇÃO NA P0620;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0630;MARCA DE IMPUTAÇÃO NA P0630;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0640;MARCA DE IMPUTAÇÃO NA P0640;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0650;MARCA DE IMPUTAÇÃO NA P0650;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Pessoas;MP0660;MARCA DE IMPUTAÇÃO NA P0660;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0670;MARCA DE IMPUTAÇÃO NA P0670;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0680;MARCA DE IMPUTAÇÃO NA P0680;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0690;MARCA DE IMPUTAÇÃO NA P0690;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0700;MARCA DE IMPUTAÇÃO NA P0700;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0710;MARCA DE IMPUTAÇÃO NA P0710;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0720;MARCA DE IMPUTAÇÃO NA P0720;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0730;MARCA DE IMPUTAÇÃO NA P0730;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0740;MARCA DE IMPUTAÇÃO NA P0740;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0750;MARCA DE IMPUTAÇÃO NA P0750;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0800;MARCA DE IMPUTAÇÃO NA P0800;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0810;MARCA DE IMPUTAÇÃO NA P0810;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0820;MARCA DE IMPUTAÇÃO NA P0820;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0830;MARCA DE IMPUTAÇÃO NA P0830;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0840;MARCA DE IMPUTAÇÃO NA P0840;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0850;MARCA DE IMPUTAÇÃO NA P0850;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0860;MARCA DE IMPUTAÇÃO NA P0860;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0870;MARCA DE IMPUTAÇÃO NA P0870;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0880;MARCA DE IMPUTAÇÃO NA P0880;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0890;MARCA DE IMPUTAÇÃO NA P0890;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0900;MARCA DE IMPUTAÇÃO NA P0900;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0970;MARCA DE IMPUTAÇÃO NA P0970;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0980;MARCA DE IMPUTAÇÃO NA P0980;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP0990;MARCA DE IMPUTAÇÃO NA P0990;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1000;MARCA DE IMPUTAÇÃO NA P1000;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1010;MARCA DE IMPUTAÇÃO NA P1010;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Pessoas;MP1050;MARCA DE IMPUTAÇÃO NA P1050;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1060;MARCA DE IMPUTAÇÃO NA P1060;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1070;MARCA DE IMPUTAÇÃO NA P1070;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1080;MARCA DE IMPUTAÇÃO NA P1080;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1090;MARCA DE IMPUTAÇÃO NA P1090;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1100;MARCA DE IMPUTAÇÃO NA P1100;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1120;MARCA DE IMPUTAÇÃO NA P1120;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1130;MARCA DE IMPUTAÇÃO NA P1130;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1140;MARCA DE IMPUTAÇÃO NA P1140;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1150;MARCA DE IMPUTAÇÃO NA P1150;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1160;MARCA DE IMPUTAÇÃO NA P1160;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1170;MARCA DE IMPUTAÇÃO NA P1170;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1180;MARCA DE IMPUTAÇÃO NA P1180;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1200;MARCA DE IMPUTAÇÃO NA P1200;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1210;MARCA DE IMPUTAÇÃO NA P1210;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Pessoas;MP1220;MARCA DE IMPUTAÇÃO NA P1220;C;marca de imputação;0 - Não Imputado | 1 - Imputado | 9 - Não aplicável;sim;sim
+Familia;F0010;Grande Região;C;geografia;1- Região Norte (uf=11 a 17) | 2- Região Nordeste (uf=21 a 29) | 3- Região Sudeste (uf=31 a 33 e 35) | 4- Região Sul (uf=41 a 43) | 5- Região Centro-oeste (uf=50 a 53);sim;sim
+Familia;F0020;Unidade da Federação;A;geografia;11- Rondônia | 12- Acre | 13- Amazonas | 14- Roraima | 15- Pará | 16- Amapá | 17- Tocantins | 21- Maranhão | 22- Piauí | 23- Ceará | 24- Rio Grande do Norte | 25- Paraíba | 26- Pernambuco | 27- Alagoas | 28- Sergipe | 29- Bahia | 31- Minas Gerais | 32- Espírito Santo | 33- Rio de Janeiro | 35- São Paulo | 41- Paraná | 42- Santa Catarina | 43- Rio Grande do Sul | 50- Mato Grosso do Sul | 51- Mato Grosso | 52- Goiás | 53- Distrito Federal;sim;sim
+Familia;F0030;Mesorregião;A;geografia;;sim;sim
+Familia;F0040;Microrregião;A;geografia;;sim;sim
+Familia;F0050;Região Geográfica Intermediária;A;geografia;;sim;sim
+Familia;F0060;Região Geográfica Imediata;A;geografia;;sim;sim
+Familia;F0070;Concentração urbana;A;geografia;;sim;sim
+Familia;F0080;Município;A;geografia;;sim;sim
+Familia;F0090;Área de Ponderação;A;geografia;;sim;sim
+Familia;F0100;Controle;N;identificação;;sim;sim
+Familia;F0101;Número de ordem da Família;A;identificação;;sim;sim
+Familia;F0111;Peso Amostral (Versão acesso Controlado);N (dec=13);peso;;sim;sim
+Familia;F0120;Situação do Setor;C;contexto do domicílio;01  - Área urbana de alta densidade de edificações | 02  - Área urbana de baixa densidade de edificações | 03  - Núcleo urbano | 05  - Povoado | 06  - Núcleo rural | 07  - Lugarejo | 08  - Área rural (exclusive aglomerados);sim;sim
+Familia;F0130;Espécie da unidade visitada;C;contexto do domicílio;01  - Domicílio particular permanente ocupado | 05  - Domicílio particular improvisado ocupado | 06  - Domicílio coletivo com morador;sim;sim
+Familia;F0140;Situação do domicílio;C;contexto do domicílio;1  - Urbana | 2  - Rural;sim;sim
+Familia;F0150;Família, identificação;C;composição da família;01  - Única | 02  - Convivente - principal | 03  - Convivente - segunda | 04  - Convivente - terceira | 05  - Convivente - quarta | 06  - Convivente - quinta | 07  - Convivente - sexta | 08  - Convivente - sétima | 09  - Convivente - oitava | 10 - Convivente - nona;sim;sim
+Familia;F0160;Pessoas na família, número;N;composição da família;;sim;sim
+Familia;F0170;Sexo do responsável pela família única ou convivente principal [Para as famílias conviventes secundárias a variável ficará em branco];C;composição da família;1 - Masculino | 2 - Feminino;sim;sim
+Familia;F0180;Idade em anos do responsável pela família única ou convivente principal, categoria [Para as famílias conviventes secundárias a variável ficará em branco];C;composição da família;01 - 0 a 4 anos | 02 - 5 a 9 anos | 03 - 10 a 14 anos | 04 - 15 a 19 anos | 05 - 20 a 24 anos | 06 - 25 a 29 anos | 07 - 30 a 34 anos | 08 - 35 a 39 anos | 09 - 40 a 44 anos | 10 - 45 a 49 anos | 11 - 50 a 54 anos | 12 - 55 a 59 anos | 13 - 60 a 64 anos | 14 - 65 a 69 anos | 15 - 70 a 74 anos | 16 - 75 a 79 anos | 17 - 80 anos ou mais | 99 - Ignorado;sim;sim
+Familia;F0181;Idade em anos do responsável pela família única ou convivente principal, número [Para as famílias conviventes secundárias a variável ficará em branco];N;composição da família;;sim;sim
+Familia;F0190;Nível de instrução do responsável pela família única ou convivente principal [Para as famílias conviventes secundárias a variável ficará em branco];C;perfil do responsável e tipologia;1 - Sem instrução e fundamental incompleto | 2 - Fundamental completo e médio incompleto | 3 - Médio completo e superior incompleto | 4 - Superior completo;sim;sim
+Familia;F0200;Cor ou raça do responsável pela família única ou convivente principal [Para as famílias conviventes secundárias a variável ficará em branco];C;perfil do responsável e tipologia;1 - Branca | 2 - Preta | 3 - Amarela | 4 - Parda | 5 - Indígena | 9 - Ignorado;sim;sim
+Familia;F0210;Família únicas e conviventes principais, tipologia [Para as famílias conviventes secundárias a variável ficará em branco];C;perfil do responsável e tipologia;01  - Casal sem filhos | 02  - Casal sem filhos e com parentes | 03  - Casal com filhos | 04  - Casal com filhos e com parentes | 05  - Mulher sem cônjuge com filhos | 06  - Mulher sem cônjuge com filhos e com parentes | 07  - Homem sem cônjuge com filhos | 08  - Homem sem cônjuge com filhos e com parentes | 09  - Mulher ou homem com dois ou mais cônjuges | 10 - Outro;sim;sim
+Familia;F0220;Famílias conviventes secundárias, tipologia [Para as famílias únicas ou conviventes principais a variável ficará em branco];C;perfil do responsável e tipologia;1 - Casal sem filhos | 2 - Casal com filhos | 3 - Mulher sem cônjuge com filhos | 4 - Homem sem cônjuge com filhos;sim;sim
+Familia;F0230;Filhos menores de 10 anos ou não economicamente ativos das Famílias únicas e conviventes principais, número [Para as famílias conviventes secundárias a variável ficará em branco];N;rendimento e composição;;sim;sim
+Familia;F0240;Integrantes da família, homens, número;N;rendimento e composição;;sim;sim
+Familia;F0250;Integrantes da família, mulheres, número;N;rendimento e composição;;sim;sim
+Familia;F0260;Rendimento familiar per capita;N (dec=2);rendimento e composição;;sim;sim
+Familia;F0270;Rendimento familiar, participação;N;rendimento e composição;1 - Ambos com rendimento | 2 - Responsável com rendimento e cônjuge ou companheiro(a) sem rendimento | 3 - Responsável sem rendimento e cônjuge ou companheiro(a) com rendimento | 4 - Ambos sem rendimento;sim;sim
+Familia;MF0190;MARCA DE IMPUTAÇÃO NA F019;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Familia;MF0200;MARCA DE IMPUTAÇÃO NA F0200;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Mortalidade;M0010;Grande Região;C;geografia;1- Região Norte (uf=11 a 17) | 2- Região Nordeste (uf=21 a 29) | 3- Região Sudeste (uf=31 a 33 e 35) | 4- Região Sul (uf=41 a 43) | 5- Região Centro-oeste (uf=50 a 53);sim;sim
+Mortalidade;M0020;Unidade da Federação;A;geografia;11- Rondônia | 12- Acre | 13- Amazonas | 14- Roraima | 15- Pará | 16- Amapá | 17- Tocantins | 21- Maranhão | 22- Piauí | 23- Ceará | 24- Rio Grande do Norte | 25- Paraíba | 26- Pernambuco | 27- Alagoas | 28- Sergipe | 29- Bahia | 31- Minas Gerais | 32- Espírito Santo | 33- Rio de Janeiro | 35- São Paulo | 41- Paraná | 42- Santa Catarina | 43- Rio Grande do Sul | 50- Mato Grosso do Sul | 51- Mato Grosso | 52- Goiás | 53- Distrito Federal;sim;sim
+Mortalidade;M0030;Mesorregião;A;geografia;;sim;sim
+Mortalidade;M0040;Microrregião;A;geografia;;sim;sim
+Mortalidade;M0050;Região Geográfica Intermediária;A;geografia;;sim;sim
+Mortalidade;M0060;Região Geográfica Imediata;A;geografia;;sim;sim
+Mortalidade;M0070;Concentração urbana;A;geografia;;sim;sim
+Mortalidade;M0080;Município;A;geografia;;sim;sim
+Mortalidade;M0090;Área de Ponderação;A;geografia;;sim;sim
+Mortalidade;M0100;Controle;N;identificação;;sim;sim
+Mortalidade;M0101;Número de ordem da pessoa falecida;A;identificação;;sim;sim
+Mortalidade;M0111;Peso Amostral (Versão acesso Controlado);N (dec=13);peso;;sim;sim
+Mortalidade;M0120;Situação do Setor;C;contexto do domicílio;01  - Área urbana de alta densidade de edificações | 02  - Área urbana de baixa densidade de edificações | 03  - Núcleo urbano | 05  - Povoado | 06  - Núcleo rural | 07  - Lugarejo | 08  - Área rural (exclusive aglomerados);sim;sim
+Mortalidade;M0130;Espécie da unidade visitada;C;contexto do domicílio;01  - Domicílio particular permanente ocupado | 05  - Domicílio particular improvisado ocupado | 06  - Domicílio coletivo com morador;sim;sim
+Mortalidade;M0140;Situação do domicílio;C;contexto do domicílio;1  - Urbana | 2  - Rural;sim;sim
+Mortalidade;M0150;Ano de ocorrência do óbito de morador do domicílio, categoria;C;características do óbito;1 - 2019 | 2 - 2020 | 3 - 2021 | 4 - 2022 | 9 - Ignorado | Branco;sim;sim
+Mortalidade;M0151;Mês e ano de ocorrência do óbito de morador do domicílio, categoria;C;características do óbito;01 - Janeiro de 2019 | 02 - Fevereiro de 2019 | 03 - Março de 2019 | 04 - Abril de 2019 | 05 - Maio de 2019 | 06 - Junho de 2019 | 07 - Julho de 2019 | 08 - Agosto de 2019 | 09 - Setembro de 2019 | 10 - Outubro de 2019 | 11 - Novembro de 2019 | 12 - Dezembro de 2019 | 13 - Janeiro de 2020 | 14 - Fevereiro de 2020 | 15 - Março de 2020 | 16 - Abril de 2020 | 17 - Maio de 2020 | 18 - Junho de 2020 | 19 - Julho de 2020 | 20 - Agosto de 2020 | 21 - Setembro de 2020 | 22 - Outubro de 2020 | 23 - Novembro de 2020 | 24 - Dezembro de 2020 | 25 - Janeiro de 2021 | 26 - Fevereiro de 2021 | 27 - Março de 2021 | 28 - Abril de 2021 | 29 - Maio de 2021 | 30 - Junho de 2021 | 31 - Julho de 2021 | 32 - Agosto de 2021 | 33 - Setembro de 2021 | 34 - Outubro de 2021 | 35 - Novembro de 2021 | 36 - Dezembro de 2021 | 37 - Janeiro de 2022 | 38 - Fevereiro de 2022 | 39 - Março de 2022 | 40 - Abril de 2022 | 41 - Maio de 2022 | 42 - Junho de 2022 | 43 - Julho de 2022 | 99 - Ignorado | Branco;sim;sim
+Mortalidade;M0160;Sexo da pessoa falecida do domicílio, categoria;C;características do óbito;1  - Masculino | 2  - Feminino | 9 - Ignorado;sim;sim
+Mortalidade;M0170;Pessoa falecida, idade calculada, categoria;C;características do óbito;01 - 0 a 4 anos | 02 - 5 a 9 anos | 03 - 10 a 14 anos | 04 - 15 a 19 anos | 05 - 20 a 24 anos | 06 - 25 a 29 anos | 07 - 30 a 34 anos | 08 - 35 a 39 anos | 09 - 40 a 44 anos | 10 - 45 a 49 anos | 11 - 50 a 54 anos | 12 - 55 a 59 anos | 13 - 60 a 64 anos | 14 - 65 a 69 anos | 15 - 70 a 74 anos | 16 - 75 a 79 anos | 17 - 80 anos ou mais | 99 - Idade ao falecer ignorada;sim;sim
+Mortalidade;M0171;Pessoa falecida, idade calculada, número;N;características do óbito;;sim;sim
+Mortalidade;MM0150;MARCA DE IMPUTAÇÃO NA M0150;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Mortalidade;MM0151;MARCA DE IMPUTAÇÃO NA M0151;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Mortalidade;MM0160;MARCA DE IMPUTAÇÃO NA M0160;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Mortalidade;MM0170;MARCA DE IMPUTAÇÃO NA M0170;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
+Mortalidade;MM0171;MARCA DE IMPUTAÇÃO NA M0171;C;marca de imputação;0 - Não Imputado | 1 - Imputado;sim;sim
