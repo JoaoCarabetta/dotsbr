@@ -46,8 +46,10 @@ dotmap/
 │   ├── deploy.md             # CI and the public /dotsbr/ path
 │   ├── user-analytics.md     # Umami (pageviews + view_switch / share); not GA
 │   ├── video.md              # Remotion promo example (not the live map)
+│   ├── motion.md             # 15s motion graphics: storyboard, sources, how to render
 │   └── structure.md          # This file
 ├── video/                    # Remotion 4 example (`Dotsbr`); npm, not the map server
+├── motion/                   # 15s motion graphics: WebGL dots from tiles/, headless capture, synth soundtrack
 ├── assets/                   # Optional extras (not in git; unused by the current UI)
 ├── tiles/                    # race MBTiles versioned as tiles/{UF}; income/deaths/religion built locally
 └── data/                     # gitignored: merged PMTiles, GeoJSON, raw census

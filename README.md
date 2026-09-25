@@ -4,7 +4,7 @@ Mapa de densidade de pontos do Censo 2022 / IBGE. A UI mostra **Raça**, **Renda
 
 Ao vivo: [https://carabetta.xyz/dotsbr/](https://carabetta.xyz/dotsbr/). Código: [github.com/JoaoCarabetta/dotsbr](https://github.com/JoaoCarabetta/dotsbr). `main` e `master` são produção ([docs/deploy.md](docs/deploy.md)).
 
-Guia completo: [docs/local-setup.md](docs/local-setup.md). Fontes e caveats: [docs/fontes.md](docs/fontes.md). Microdados da amostra (acesso controlado): [docs/dicionario-microdados.md](docs/dicionario-microdados.md). Exemplo de vídeo em Remotion: [docs/video.md](docs/video.md) (`cd video && npx remotion studio`).
+Guia completo: [docs/local-setup.md](docs/local-setup.md). Fontes e caveats: [docs/fontes.md](docs/fontes.md). Microdados da amostra (acesso controlado): [docs/dicionario-microdados.md](docs/dicionario-microdados.md). Exemplo de vídeo em Remotion: [docs/video.md](docs/video.md) (`cd video && npx remotion studio`). Motion graphics de 15s com os pontos reais: [docs/motion.md](docs/motion.md) (`motion/renders/`).
 
 ## Run locally (tiles already in the repo)
 
