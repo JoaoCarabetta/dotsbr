@@ -30,7 +30,7 @@ dotmap/
 │   ├── build_municipality.py     # Themed CSV + municipal malha → hover GeoJSON
 │   ├── build_census_tract.py     # Themed CSV + setor malha → detailed GeoJSON
 │   ├── build_religion_apond.py   # Sample P0410 × P0111 → APOND CSV + dasymetric setor + hover (drops water leftovers)
-│   ├── build_density_clusters.py # Themed adjacent setores → cluster_{UF}_z3…z6.geojson
+│   ├── dot_tiles.py              # Audit dot shares per zoom; thin z14 into nested z3–13 (unbiased)
 │   ├── serve.py                  # Static server with HTTP Range for PMTiles
 │   ├── build_theme_uf.sh         # One UF × theme: GeoJSON, clusters, tiles
 │   ├── build_theme_pair.sh       # One UF: income then deaths

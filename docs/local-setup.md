@@ -11,8 +11,8 @@ In the repo:
 - `card.jpg` (stripped 1200×630 JPEG for Open Graph)
 - `og.html` (tiny crawler-only Open Graph document; nginx serves it to WhatsApp)
 - `favicon.svg` / `favicon.ico` / `apple-touch-icon.png` (tab and iOS home-screen icon; five census-color dots)
-- `tiles/{UF}/zoom3-3` … `tiles/{UF}/zoom14-14` (per-UF race MBTiles; 27 UFs; 3–6 clustered setor)
-- Theme builders (`scripts/themes.py`, `makefiles.sh` with a theme arg). **Income/deaths per-UF MBTiles are not versioned** — generate them locally, then `tile-join` to PMTiles
+- `tiles/{UF}/zoom3-3` … `tiles/{UF}/zoom14-14` (per-UF race MBTiles; 27 UFs; z3–13 are random subsets of z14)
+- Theme builders (`scripts/themes.py`, `makefiles.sh` with a theme arg). Income, deaths and religion per-UF MBTiles are versioned under `tiles/{theme}/{UF}/` — `tile-join` them to PMTiles like race
 
 Not in git (`data/` is missing on a fresh clone):
 
@@ -33,7 +33,7 @@ Not in git (`data/` is missing on a fresh clone):
 
 `mapshaper` / Node.js are only needed to **regenerate** dots via `makefiles.sh`, not to serve existing tiles.
 
-Do **not** run `./makefiles.sh` just to view the map. The script requires a UF argument (`./makefiles.sh RR`) and needs GeoJSON under `data/` that is not in git. A full run regenerates 7–14 for **that UF only**; other states in `tiles/` stay put. To rebuild only clustered z3–6: `python3 scripts/build_density_clusters.py RR` then `./makefiles.sh RR 3,4,5,6`. For all 27 UFs, set `SKIP_TILE_JOIN=1` per UF and run one `tile-join` at the end.
+Do **not** run `./makefiles.sh` just to view the map. The script requires a UF argument (`./makefiles.sh RR`) and needs GeoJSON under `data/` that is not in git. A full run redraws z14 for **that UF only** from its setor polygons and rebuilds z3–13 by thinning z14; other states in `tiles/` stay put. To rebuild zooms below 14 from the versioned z14 (no GeoJSON, needs `tippecanoe`): `./makefiles.sh RR 3,4,5,6` or `python3 scripts/dot_tiles.py thin race RR`. For all 27 UFs, set `SKIP_TILE_JOIN=1` per UF and run one `tile-join` at the end.
 
 ## Serve existing tiles (reproduced path)
 
@@ -86,7 +86,6 @@ Needs GCP access to `rj-escritorio-dev` and raw files that live only under `data
 ```sh
 python3 scripts/build_municipality.py RR
 python3 scripts/build_census_tract.py RR
-python3 scripts/build_density_clusters.py RR
 ```
 
 For income or deaths, pass the theme. National rebuild (two UFs in parallel):
@@ -110,12 +109,13 @@ python3 scripts/build_religion_apond.py hover   # optional: dissolve again (drop
 python3 scripts/ibge_uf.py aponds              # rebuilds hover.pmtiles (replaces aponds, does not stack)
 ```
 
-3. Generate dots and per-UF MBTiles for that UF. A full run regenerates 7–14 for that state only, then joins a national PMTiles:
+3. Generate dots and per-UF MBTiles for that UF. A full run draws z14 from the setor polygons (stochastic rounding) and thins it into z3–13, then joins a national PMTiles:
 
 ```sh
-./makefiles.sh RR            # all zooms 3–14 for RR, then tile-join every UF → .pmtiles
-./makefiles.sh RR 3,4,5,6    # clustered zooms only
-# National z3–6 rebuild: SKIP_TILE_JOIN=1 ./makefiles.sh UF 3,4,5,6 per UF, then one join
+./makefiles.sh RR            # z14 from polygons + z3–13 thinned, then tile-join every UF → .pmtiles
+./makefiles.sh RR 3,4,5,6    # re-thin some zooms from the versioned z14 (no GeoJSON)
+python3 scripts/dot_tiles.py thin race          # every UF, z3–13, from the versioned z14
+python3 scripts/dot_tiles.py audit race         # shares + people implied per zoom
 ```
 
 4. Then serve as in the section above. `makefiles.sh` already writes `data/tiles/censo2022.pmtiles`.

@@ -30,21 +30,21 @@ Open `http://localhost:8000`. Tiles come from `/data/tiles/censo2022.pmtiles` on
 
 Without restoring extra files from elsewhere:
 
-- **Works:** light-v10 basemap (no labels, no satellite) + national **Raça** dots (zooms 3–14; 3–6 clustered setor). **Renda** and **Religião** need a local `tile-join` of `tiles/income/` / `tiles/religion/` (theme MBTiles are built locally, not versioned here). **Óbitos** is hidden in the UI.
+- **Works:** light-v10 basemap (no labels, no satellite) + national **Raça** dots (zooms 3–14; z3–13 are random subsets of z14). **Renda** and **Religião** need a local `tile-join` of `tiles/income/` / `tiles/religion/` (their per-UF MBTiles are versioned like race). **Óbitos** is hidden in the UI.
 - **404:** hover tiles (`data/tiles/hover.pmtiles`) until `python3 scripts/ibge_uf.py tiles`
 
 ## Create the dataset from scratch
 
-Needs the national race CSV under `data/` (see [docs/fontes.md](docs/fontes.md)). Do not run this just to view the map: a full `./makefiles.sh UF` regenerates zooms 7–14 for that state (expensive). Other UFs already in `tiles/` are left alone.
+Needs the national race CSV under `data/` (see [docs/fontes.md](docs/fontes.md)). Do not run this just to view the map: a full `./makefiles.sh UF` redraws z14 for that state from its setor polygons (expensive) and rebuilds z3–13 by thinning z14. Other UFs already in `tiles/` are left alone. Why thinning: see [docs/docs.md](docs/docs.md#why-zooms-are-thinned-from-z14-undercount-fix).
 
 Add or rebuild one UF (all 27 are already in `tiles/`, including SP and MG):
 
 ```sh
 python3 scripts/build_municipality.py RR
 python3 scripts/build_census_tract.py RR
-python3 scripts/build_density_clusters.py RR   # clustered setores for zooms 3–6
-./makefiles.sh RR            # all zooms 3–14 for that UF, then tile-join every UF
-./makefiles.sh RR 3,4,5,6    # clustered zooms only (needs the cluster GeoJSON)
+./makefiles.sh RR            # z14 from polygons + z3–13 thinned, then tile-join every UF
+./makefiles.sh RR 3,4,5,6    # re-thin z3–6 from the versioned z14 (no GeoJSON needed)
+python3 scripts/dot_tiles.py audit race   # category shares and people implied per zoom
 ```
 
 Income and death themes use the same builders with a theme argument. National loop (two UFs at a time, join once at the end):

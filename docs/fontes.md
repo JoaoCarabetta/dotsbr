@@ -47,7 +47,7 @@ Log of census files used by this project. Raw downloads stay under `data/` (giti
 
 - **Official name:** Malha Municipal Digital 2022 — municípios por UF
 - **URL pattern:** `https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2022/UFs/{UF}/{UF}_Municipios_2022.zip`
-- **Used by:** `scripts/build_municipality.py` (hover polygons z3–9; dots at z3–6 use clustered setores instead)
+- **Used by:** `scripts/build_municipality.py` (hover polygons z3–9; dots at every zoom come from setores)
 - **Fields used:** `CD_MUN` → `id_municipio`, `NM_MUN` → `municipio`, `SIGLA_UF` → `sigla_uf`
 - **Built so far:** all 27 UFs
 
@@ -55,7 +55,7 @@ Log of census files used by this project. Raw downloads stay under `data/` (giti
 
 - **Official name:** Malha de Setores Censitários 2022 (oficial, não a preliminar)
 - **URL pattern:** `https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_de_setores_censitarios__divisoes_intramunicipais/censo_2022/setores/shp/UF/{UF}_setores_CD2022.zip`
-- **Used by:** `scripts/build_census_tract.py` (join on `CD_SETOR`; input for zoom 7–14) and `scripts/build_density_clusters.py` (`CD_SIT` / `AREA_KM2`; input for zoom 3–6 clustered dots)
+- **Used by:** `scripts/build_census_tract.py` (join on `CD_SETOR`; input for the z14 dots, which z3–13 are thinned from)
 - **Why per-UF:** the national `BR_setores_CD2022.gpkg` is ~1.4 GB and is not downloaded
 - **Join caveat:** malha has more setores than the race table (empty / no-people cells). Unmatched polygons get zero dots. All 27 UFs are built.
 
@@ -81,7 +81,7 @@ Religion is **not** on the basic questionnaire. There is no universe-by-setor fi
 - **Weight / universe:** `sum(P0111)` by `P0090` × official group `P0410`. Blank `P0410` is under 10 years — not “sem religião”. Keep `MP0410 = 1` imputations.
 - **Map classification:** the nine `P0410` codes; 8+9 merge into `relig_sem_info`. Do not put the 33 `P0411` denominations on the legend ([IBGE note](https://ftp.ibge.gov.br/Censos/Censo_Demografico_2022/Microdados_e_Areas_de_Ponderacao/Documentacao/Notas%20metodol%C3%B3gicas/Notas%20metodol%C3%B3gicas%2006-2026%20-%20Classifica%C3%A7%C3%A3o%20dos%20grupos%20de%20religi%C3%B5es%20adotada%20na%20divulga%C3%A7%C3%A3o%20dos%20microdados%20da%20amostra.pdf): Missão / pentecostal / indígena / “não determinada” are not comparable to 2010).
 - **Suppression:** weighted cell &lt; ~400 or unweighted n &lt; 30 is not painted; hover says “estimativa instável”.
-- **Dasymetric dots:** DePara setor→APOND + race `populacao` so dots sit on inhabited setor/cluster polygons, never sprayed across empty APOND interior. Same mix at every zoom.
+- **Dasymetric dots:** DePara setor→APOND + race `populacao` so dots sit on inhabited setor polygons, never sprayed across empty APOND interior. Same mix at every zoom.
 - **Output (gitignored):** `data/censo2022/output/tiles/religion/apond_religion.csv` (~14k APOND rows). Do **not** commit `*_controlado.csv`.
 - **Sanity check:** expander prints national shares vs the official sample (Católica 56.7%, Evangélicas 26.9%, Sem religião 9.3%). A small gap is the 50% subsample; a large one is a bug.
 - **Malha APOND:** [APONDs2022 Geometrias](https://geoftp.ibge.gov.br/recortes_para_fins_estatisticos/malha_de_areas_de_ponderacao/censo_demografico_2022/APONDs2022_Geometrias/) — hover dissolves setores by `id_apond` instead of downloading the 375 MB `Brasil.gpkg`. Cells with no `id_apond` (often water in the setor malha) are filtered out before dissolve so they do not become one leftover sea polygon.

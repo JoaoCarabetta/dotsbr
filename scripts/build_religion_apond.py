@@ -2,7 +2,7 @@
 """Expand controlled sample religion to APOND, then allocate onto setores.
 
 Religion is sample-only and only valid at the weighting area. Dots still
-sit on setor/cluster polygons so they follow where people live (dasymetric),
+sit on setor polygons so they follow where people live (dasymetric),
 but every setor in an APOND gets that APOND's mix.
 """
 

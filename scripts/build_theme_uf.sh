@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build one UF for income or deaths: GeoJSON, clusters, and per-zoom MBTiles.
+# Build one UF for a theme: setor GeoJSON, then z14 dots and thinned z3–13.
 # SKIP_TILE_JOIN stays on so a national loop can join once at the end.
 set -euo pipefail
 if [ $# -lt 2 ]; then
@@ -18,6 +18,5 @@ else
     python3 scripts/build_census_tract.py "$UF" "$THEME"
     python3 scripts/build_municipality.py "$UF" "$THEME"
 fi
-python3 scripts/build_density_clusters.py "$UF" 3,4,5,6 "$THEME"
 SKIP_TILE_JOIN=1 ./makefiles.sh "$UF" "$THEME"
 echo "==== done ${THEME} ${UF} ===="

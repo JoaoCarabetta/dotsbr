@@ -28,7 +28,7 @@ Os cortes caem numa grade de 133⅓ BPM (tempo de 0,45 s) que começa na explos�
 ### De onde vêm os números
 
 - **Nacionais** (203.080.756 e as cinco barras): Censo 2022, IBGE, cor ou raça. As barras usam uma subamostra dos pontos na proporção oficial.
-- **Por que não a contagem de pontos**: nos zooms baixos o `mapshaper -dots` arredonda cada polígono, e os grupos pequenos somem. No z5 nacional, `preta` é 4,5 % dos pontos (oficial 10,2 %) e `amarela` 0,04 %; no z10 volta a 9,5 %. Isso vale também para o mapa ao vivo.
+- **Por que não a contagem de pontos**: quando o vídeo foi renderizado, os zooms baixos vinham de um `mapshaper -dots` que arredondava cada polígono, e os grupos pequenos sumiam (z5 nacional: `preta` 4,5 % dos pontos, oficial 10,2 %). Os tiles foram corrigidos depois (z3–13 agora são subconjuntos do z14; ver [`docs.md`](docs.md#why-zooms-are-thinned-from-z14-undercount-fix)); `npm run data` e um novo render deixam o mapa nacional do vídeo igual ao do site.
 - **Rio** (`npm run stats` → `scripts/rio_stats.mjs`): pontos do z12 dentro de retângulos aproximados (“Zona Sul orla” = Botafogo a Leblon; “Baixada” = Caxias, Belford Roxo, São João de Meriti, Nilópolis e parte de Nova Iguaçu; “Zona Oeste” = Bangu a Santa Cruz). Os resultados foram arredondados para frações de propósito: Zona Sul 78 % branca, Baixada 32 %; Zona Sul 74 % dos domicílios em vizinhanças de 5+ SM, Baixada 94 % até 2 SM; evangélicos 9 % na Zona Sul e 38 % na Zona Oeste.
 - Renda é a renda típica do responsável na vizinhança (`V06006`), não renda individual. Religião vem da amostra (10+ anos) e não tem resolução de setor.
 

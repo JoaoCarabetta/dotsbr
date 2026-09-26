@@ -4,31 +4,51 @@ Agent instructions for this repo live in [`AGENTS.md`](../AGENTS.md). Project la
 
 This document describes the relationship between zoom levels and dot density in the map visualization.
 
-The UI switches between **Raça**, **Renda**, and **Religião**, all with 27-UF coverage. Renda dots represent occupied permanent private households and are colored by the setor median income of responsible persons with income. Religião is sample-only: the mix is estimated at the weighting area (APOND) and painted dasymetrically onto the same setor/cluster polygons — zoom changes `1 ponto = N`, not the geography of the color.
+The UI switches between **Raça**, **Renda**, and **Religião**, all with 27-UF coverage. Renda dots represent occupied permanent private households and are colored by the setor median income of responsible persons with income. Religião is sample-only: the mix is estimated at the weighting area (APOND) and painted dasymetrically onto the same setor polygons — zoom changes `1 ponto = N`, not the geography of the color.
 
 **Óbitos is built but hidden from the UI for now**: the tiles (`tiles/deaths/`, `censo2022_deaths.pmtiles`), the makefiles theme, and the `deaths` entry in `VIEW_CONFIGS` all stay, but the switcher buttons were removed and `HIDDEN_VIEWS` in `index.html` makes `setView('deaths')` a no-op (persisted `dotmap-view: deaths` falls back to race on load). The UI label is **Mortes** (not “Óbitos”). Dots represent deaths reported for January 2019–July 2022, colored by age at death; sex is summed, not shown. To un-hide: restore the button in both switchers and drop `deaths` from `HIDDEN_VIEWS`.
 
 ## Configuration Table
 
-Source of truth for **how tiles are generated** is [`makefiles.sh`](../makefiles.sh): `aggregation_levels` (`cluster` → `cluster_{UF}_zN.geojson` at z3–6, otherwise `census_tract_{UF}.geojson`) plus `per_dot_values`. Municipality GeoJSON is hover-only. The legend (`1 ponto = N pessoas`) and the localhost HUD **fonte** / pessoas/ponto use this same table. Zoom 15 has no tiles; N is the z14 value (20).
+Source of truth for **how tiles are generated** is [`makefiles.sh`](../makefiles.sh) + [`scripts/dot_tiles.py`](../scripts/dot_tiles.py); `per_dot` for every theme and zoom lives in [`scripts/themes.py`](../scripts/themes.py). Only **z14** is drawn from polygons (`census_tract_{UF}.geojson`, stochastic rounding); **z3–13 are nested random subsets of the z14 dots**. Municipality GeoJSON is hover-only. The legend (`1 ponto = N pessoas`) and the localhost HUD **fonte** / pessoas/ponto use this same table. Zoom 15 has no tiles; N is the z14 value (20).
 
-### Geometry source by zoom (`makefiles.sh`)
+### How each zoom is built
 
-| Zoom | Geometry source | `per_dot` (people per dot) |
-|------|-----------------|----------------------------|
-| 3 | setor agrupado (`cluster` → `cluster_*_z3.geojson`) | 4 500 |
-| 4 | setor agrupado (`cluster_*_z4.geojson`) | 2 000 |
-| 5 | setor agrupado (`cluster_*_z5.geojson`) | 900 |
-| 6 | setor agrupado (`cluster_*_z6.geojson`) | 400 |
-| 7 | setor censitário (`census` → `census_tract_*.geojson`) | 150 |
-| 8 | setor censitário | 120 |
-| 9 | setor censitário | 90 |
-| 10 | setor censitário | 70 |
-| 11 | setor censitário | 50 |
-| 12 | setor censitário | 35 |
-| 13 | setor censitário | 25 |
-| 14 | setor censitário | 20 |
-| 15 | *(no tiles — camera overzooms the z=14 setor set)* | 20 |
+| Zoom | Built from | `per_dot` (people per dot) |
+|------|------------|----------------------------|
+| 3 | z14 dots, each kept with p = 20 / 4 500 | 4 500 |
+| 4 | z14 dots, p = 20 / 2 000 | 2 000 |
+| 5 | z14 dots, p = 20 / 900 | 900 |
+| 6 | z14 dots, p = 20 / 400 | 400 |
+| 7 | z14 dots, p = 20 / 150 | 150 |
+| 8 | z14 dots, p = 20 / 120 | 120 |
+| 9 | z14 dots, p = 20 / 90 | 90 |
+| 10 | z14 dots, p = 20 / 70 | 70 |
+| 11 | z14 dots, p = 20 / 50 | 50 |
+| 12 | z14 dots, p = 20 / 35 | 35 |
+| 13 | z14 dots, p = 20 / 25 | 25 |
+| 14 | setor censitário (`census_tract_*.geojson`, `mapshaper -dots` after stochastic rounding) | 20 |
+| 15 | *(no tiles — camera overzooms the z=14 set)* | 20 |
+
+Themes follow the same rule with their own `per_dot` (p = per_dot[z14] / per_dot[z]).
+
+### Why zooms are thinned from z14 (undercount fix)
+
+`mapshaper -dots` computes each polygon's dots per category as `Math.round(value / per_dot)`. A group smaller than half a dot in a polygon never gets a dot, so the old per-zoom runs erased small groups — worst at coarse zooms, where `per_dot` is large. A second loss came from tippecanoe's `--drop-fraction-as-needed`: dense metro tiles over 500 KB / 200k features were thinned, and those tiles are richer and whiter than the country.
+
+Measured on the tiles before the fix (`python3 scripts/dot_tiles.py audit <theme>`, national):
+
+| Zoom | Race: preta share of dots | Race: people implied | Religião: católica / sem religião | Renda: households implied |
+|---|---:|---:|---:|---:|
+| 5 | 4.5% | 184.0M | 67.6% / 4.1% | 71.5M |
+| 6 | 2.8% | 183.2M | 70.7% / 2.0% | 71.5M |
+| 7 | 7.4% | 183.9M | 64.2% / 6.3% | 65.1M |
+| 9 | 9.4% | 178.5M | 61.3% / 8.4% | 64.5M |
+| 14 | 10.2% | 202.6M | 58.2% / 9.0% | 72.4M |
+
+Now: (1) z14 uses **stochastic rounding** inside mapshaper (`-each`, a deterministic hash per feature and field): a group worth 0.3 dots gets a dot 30% of the time, so expected dots equal people / per_dot in every setor. The census GeoJSON keeps exact counts on disk (hover reads them). (2) Every coarser zoom keeps each z14 dot when its fixed random draw is below per_dot[14] / per_dot[z]; the expectation matches z14 for every category and place, dots stay inside their setor (no clusters needed), and zooming in only adds dots. (3) tippecanoe runs with `--no-feature-limit --no-tile-size-limit` (and `-x r`, the unused radius attribute mapshaper adds), so no tile drops dots.
+
+The versioned z3–13 tiles were rebuilt this way from the versioned z14 (the census CSVs are not in git). z14 itself still comes from the old `Math.round` run until the next source rebuild: for race it is within 0.1 pp of the IBGE shares (indígena 0.5% vs 0.6%, amarela 0.3% vs 0.4%), but **Religião at z14 still under-draws small groups** (Umbanda e Candomblé 0.5% of dots, Espírita 1.3%), because each setor's APOND mix is split across eight categories at 18 people per dot. Rebuilding z14 from `apond_religion.csv` with the new `makefiles.sh` fixes it.
 
 ### Theme density scales (national)
 
@@ -53,32 +73,32 @@ Income categories use `V06006` divided by the 2022 minimum wage (R$ 1,212): up t
 
 Mortality categories are `0–14`, `15–29`, `30–59`, `60+`, and `idade suprimida`. The last category is required because IBGE suppresses detailed-age cells much more often than sex totals. Nationally, about 3.63M deaths have a visible sex total and 1.91M have a visible detailed age.
 
-Religião is **not** on the basic questionnaire. The mix comes from the controlled sample (`P0410` × weight `P0111`, people aged 10+). Official groups: Católica, Evangélicas, Espírita, Umbanda e Candomblé, Tradições indígenas, Outras, Sem religião; codes 8+9 collapse to Sem informação. Do **not** put `P0411` denominations on the legend. Cells with weighted total &lt; 400 or unweighted n &lt; 30 are not painted; hover labels them **estimativa instável**. Clusters at z3–6 never dissolve across an APOND border. Keep imputed rows (`MP0410 = 1`).
+Religião is **not** on the basic questionnaire. The mix comes from the controlled sample (`P0410` × weight `P0111`, people aged 10+). Official groups: Católica, Evangélicas, Espírita, Umbanda e Candomblé, Tradições indígenas, Outras, Sem religião; codes 8+9 collapse to Sem informação. Do **not** put `P0411` denominations on the legend. Cells with weighted total &lt; 400 or unweighted n &lt; 30 are not painted; hover labels them **estimativa instável**. Every zoom is a subset of the z14 setor dots, so no zoom mixes two APONDs. Keep imputed rows (`MP0410 = 1`).
 
 Hover on the map is a different cutoff: município polygons below zoom 10, setor from 10 — except in **Religião**, which always queries the `aponds` layer (weighting area at every zoom). The dissolve drops malha cells with no `id_apond` (water and other leftover mesh) so the sea is not a hover hit. Do not read hover as the tile-generation unit.
 
-`per_dot` steps ~2.25× into z7 (4 500 / 2 000 / 900 / 400 / 150). Cluster polygons come from [`scripts/build_density_clusters.py`](../scripts/build_density_clusters.py): adjacent setores of the same density class (urban/povoado vs zona rural) merge until each cluster has about `per_dot` people, so dots stay on settlements instead of filling the município. All **27 UFs** have clustered tiles at zooms 3–6.
+`per_dot` steps ~2.25× into z7 (4 500 / 2 000 / 900 / 400 / 150). Coarse-zoom dots stay on settlements because they are z14 dots, which `mapshaper -dots` placed inside setores; the old density clusters (`build_density_clusters.py`) are gone.
 
 | Zoom | Aggregation | People per dot (`per_dot`) | Approx. dots | Circle radius (px) |
 |------|-------------|----------------------------|--------------|--------------------|
-| 3 | Clustered setor | 4 500 | ~390 (SE) | 0.96 |
-| 4 | Clustered setor | 2 000 | ~930 (SE) | 0.96 |
-| 5 | Clustered setor | 900 | ~2 100 (SE) | 0.96 |
-| 6 | Clustered setor | 400 | ~4 600 (SE) | 0.96 |
-| 7 | Census tract | 150 | ~14 000 (SE) / ~110 000 (RJ) | 0.96 |
-| 8 | Census tract | 120 | | 1.04 |
-| 9 | Census tract | 90 | | 1.12 |
-| 10 | Census tract | 70 | | 1.20 |
-| 11 | Census tract | 50 | | 1.28 |
-| 12 | Census tract | 35 | | 1.36 |
-| 13 | Census tract | 25 | | 2.16 |
-| 14 | Census tract | 20 | | 2.16 |
+| 3 | Thinned z14 | 4 500 | ~390 (SE) | 0.96 |
+| 4 | Thinned z14 | 2 000 | ~930 (SE) | 0.96 |
+| 5 | Thinned z14 | 900 | ~2 100 (SE) | 0.96 |
+| 6 | Thinned z14 | 400 | ~4 600 (SE) | 0.96 |
+| 7 | Thinned z14 | 150 | ~14 000 (SE) / ~110 000 (RJ) | 0.96 |
+| 8 | Thinned z14 | 120 | | 1.04 |
+| 9 | Thinned z14 | 90 | | 1.12 |
+| 10 | Thinned z14 | 70 | | 1.20 |
+| 11 | Thinned z14 | 50 | | 1.28 |
+| 12 | Thinned z14 | 35 | | 1.36 |
+| 13 | Thinned z14 | 25 | | 2.16 |
+| 14 | Census tract (stochastic rounding) | 20 | | 2.16 |
 | 15 | Census tract (overzoom) | 20 | | 2.16 |
 
 ## Details
 
-- **Clustered setor (zoom 3–6):** Adjacent census tracts of the same density class are dissolved until each polygon has about `per_dot` people (4 500 / 2 000 / 900 / 400). Dots stay on the urban/povoado footprint instead of filling the município. All 27 UFs use this level.
-- **Census tract (zoom 7–14):** One polygon per setor. z7 is 150 people/dot, so 6→7 is a ~2.7× refinement of the same settlement pattern.
+- **z14:** one polygon per setor, stochastic rounding, 20 people/dot.
+- **z3–13:** nested random subsets of z14 (`scripts/dot_tiles.py thin`). Unbiased per category and per place; each zoom's dots are also on the next zoom, so zooming in adds dots instead of reshuffling them. Low zooms are noisier in sparse places (a rural setor worth 0.1 dot at z3 shows one dot 10% of the time), never systematically short.
 - Recorte atual dos pontos: **27 UFs** (cobertura nacional). Hover de município/setor (e `aponds` na view Religião) vem de `data/tiles/hover.pmtiles` (não do GeoJSON concatenado): o `census_tract.geojson` nacional (~248 MB) trava o mapa no zoom alto.
 - MapLibre treats `minZoom` as inclusive, so `index.html` sets it to **3** (first point tileset). Camera `maxZoom` is **15** so the local Rio shortcut can overzoom; the vector source still advertises `minzoom: 3` / `maxzoom: 14` (no z=15 PBF). Archives are same-origin PMTiles (`data/tiles/*.pmtiles`); do not gzip them. Production CSP must allow MapLibre blob workers (`worker-src 'self' blob:`); see [`deploy.md`](deploy.md).
 - The map **opens on Brazil, not Rio**: constructor fallback `[-51.9, -14.2]` at zoom 3.5, then a camera calculated from `[[-74, -34], [-32, 6]]`. When that whole-country fit would fall below the first point tiles on a narrow portrait screen, startup keeps the national center and clamps to zoom 3 so dots render instead of showing an empty overview. Point tiles cover all 27 UFs. A `tile-join` without `--no-tile-size-limit` still drops the SP+MG overlap at z7 (XYZ `7/47/72`, ~508 KB vs the 500 KB default) and leaves São Paulo blank even though `tiles/SP/` is complete.
@@ -103,18 +123,9 @@ Contains demographic data at the census tract level with the following attribute
 - `parda`: Brown/Mixed population count
 - `indigena`: Indigenous population count
 
-### Clustered setor (zooms 3–6)
-
-`output/tiles/race/cluster_{UF}_z3.geojson` … `cluster_{UF}_z6.geojson` from [`scripts/build_density_clusters.py`](../scripts/build_density_clusters.py). Same race fields as municipality, plus:
-- `cluster_id`: `{UF}-z{zoom}-{n}`
-- `density_class`: `dense` (CD_SIT 1–3, 5–7) or `sparse` (8–9)
-- `sigla_uf`, `populacao`, five race counts (sums of member setores)
-
-Clusters may cross município borders inside the UF. They are placement polygons for `mapshaper -dots`, not a hover layer.
-
 ## Usage Notes
 - Census tract data is suitable for detailed local analysis
-- Clustered setores keep coarse-zoom dots on settlements
+- Coarse-zoom dots are subsets of the z14 setor dots, so they stay on settlements
 - Municipality polygons are hover-only (z3–9), not a dot-placement unit
 - All population counts are absolute numbers
 
