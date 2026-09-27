@@ -1,10 +1,13 @@
 // Frame-exact capture: serve motion/, step window.renderFrame(t) in headless
 // Chromium, pipe PNG frames into ffmpeg (libx264), mux the soundtrack.
 //
-//   node scripts/render.mjs                         # 1920×1080 → out/dotsbr-15s.mp4
-//   node scripts/render.mjs --w 1080 --h 1920       # vertical → out/dotsbr-15s-vertical.mp4
+//   node scripts/render.mjs                         # 1920×1080 → out/dotsbr.mp4
+//   node scripts/render.mjs --w 1080 --h 1920       # vertical → out/dotsbr-vertical.mp4
 //   node scripts/render.mjs --stills 0.5,3.2,8      # PNGs in out/stills/ for review
-//   --workers 2   split the frames across pages (SwiftShader is CPU-bound)
+//   --workers 2      split the frames across pages (SwiftShader is CPU-bound)
+//   --fps 30         frame rate (default 30)
+//   --target-mib 28  two-pass encode to a file size (chat/upload limits);
+//                    otherwise one pass at --crf (default 23)
 //
 // Env: CHROME (browser binary), FFMPEG (ffmpeg with libx264).
 import { chromium } from 'playwright-core';
@@ -20,7 +23,8 @@ const args = Object.fromEntries(
 );
 const W = Number(args.w || 1920);
 const H = Number(args.h || 1080);
-const FPS = Number(args.fps || 60);
+const FPS = Number(args.fps || 30);
+const TARGET_MIB = args['target-mib'] ? Number(args['target-mib']) : null;
 const vertical = H > W;
 const OUT = path.join(ROOT, 'out');
 fs.mkdirSync(OUT, { recursive: true });
@@ -59,8 +63,13 @@ async function openPage() {
   return { page, shot };
 }
 
-const ENCODE = ['-c:v', 'libx264', '-preset', 'slow', '-crf', String(args.crf || 23), '-pix_fmt', 'yuv420p',
-  '-profile:v', 'high', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709'];
+const COLOR = ['-pix_fmt', 'yuv420p', '-profile:v', 'high', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709'];
+// With a size target the workers write a near-lossless intermediate and the
+// real encode happens afterwards in two passes; dense dot fields are costly
+// for H.264, so a CRF alone cannot promise a size.
+const ENCODE = TARGET_MIB
+  ? ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '8', ...COLOR]
+  : ['-c:v', 'libx264', '-preset', 'slow', '-crf', String(args.crf || 23), ...COLOR];
 const run = (argv) => new Promise((r, j) => {
   const p = spawn(FFMPEG, argv, { stdio: ['pipe', 'inherit', 'inherit'] });
   p.on('close', (c) => (c ? j(new Error(`ffmpeg ${c}`)) : r()));
@@ -82,7 +91,7 @@ if (args.stills) {
   const duration = await first.evaluate(() => window.DURATION);
   await first.close();
   const frames = Math.round(duration * FPS);
-  const name = args.out || `dotsbr-15s${vertical ? '-vertical' : ''}.mp4`;
+  const name = args.out || `dotsbr${vertical ? '-vertical' : ''}.mp4`;
   const audio = path.join(OUT, 'soundtrack.wav');
   const withAudio = fs.existsSync(audio) && !args['no-audio'];
   const t0 = Date.now();
@@ -99,7 +108,7 @@ if (args.stills) {
     for (let f = a; f < b; f++) {
       const png = await shot(f / FPS);
       if (!ff.stdin.write(png)) await new Promise((r) => ff.stdin.once('drain', r));
-      if (++done % 60 === 0) console.log(`frame ${done}/${frames}  ${((Date.now() - t0) / 1000).toFixed(0)}s`);
+      if (++done % (FPS * 2) === 0) console.log(`frame ${done}/${frames}  ${((Date.now() - t0) / 1000).toFixed(0)}s`);
     }
     ff.stdin.end();
     await closed;
@@ -107,9 +116,27 @@ if (args.stills) {
   }));
   const list = path.join(OUT, 'segments.txt');
   fs.writeFileSync(list, segs.map((s) => `file '${s}'`).join('\n'));
-  await run(['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list,
-    ...(withAudio ? ['-i', audio, '-c:a', 'aac', '-b:a', '256k', '-shortest'] : []),
-    '-c:v', 'copy', '-movflags', '+faststart', path.join(OUT, name)]);
+  const out = path.join(OUT, name);
+  if (TARGET_MIB) {
+    const inter = path.join(OUT, `inter-${vertical ? 'v' : 'h'}.mp4`);
+    await run(['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', inter]);
+    const audioKbps = 192;
+    // 3% headroom for the MP4 container and rate-control overshoot.
+    const videoKbps = Math.floor((TARGET_MIB * 8 * 1048576 * 0.97) / duration / 1000 - (withAudio ? audioKbps : 0));
+    const log = path.join(OUT, `pass-${vertical ? 'v' : 'h'}`);
+    const common = ['-c:v', 'libx264', '-preset', 'slow', '-b:v', `${videoKbps}k`, '-maxrate', `${Math.round(videoKbps * 1.6)}k`,
+      '-bufsize', `${videoKbps * 3}k`, ...COLOR, '-passlogfile', log];
+    await run(['-y', '-loglevel', 'error', '-i', inter, ...common, '-pass', '1', '-an', '-f', 'null', '/dev/null']);
+    await run(['-y', '-loglevel', 'error', '-i', inter, ...(withAudio ? ['-i', audio] : []), ...common, '-pass', '2',
+      ...(withAudio ? ['-c:a', 'aac', '-b:a', `${audioKbps}k`, '-shortest'] : []), '-movflags', '+faststart', out]);
+    fs.rmSync(inter);
+    for (const f of fs.readdirSync(OUT)) if (f.startsWith(path.basename(log))) fs.rmSync(path.join(OUT, f));
+    console.log(`two-pass: ${videoKbps} kb/s video → ${(fs.statSync(out).size / 1048576).toFixed(1)} MiB`);
+  } else {
+    await run(['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list,
+      ...(withAudio ? ['-i', audio, '-c:a', 'aac', '-b:a', '256k', '-shortest'] : []),
+      '-c:v', 'copy', '-movflags', '+faststart', out]);
+  }
   segs.forEach((s) => fs.rmSync(s));
   fs.rmSync(list);
   console.log(`wrote out/${name} in ${((Date.now() - t0) / 1000).toFixed(0)}s`);

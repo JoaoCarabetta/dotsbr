@@ -1,6 +1,6 @@
 // Kinetic type and the product's own chrome (search pill, "1 ponto = N"
 // chip, lens switcher, map pins), all positioned as a pure function of t.
-import { T, PALETTE, RACE_SHARES, PLACES, perDotAt, hookPoint } from './story.js';
+import { T, DURATION, PALETTE, RACE_SHARES, PLACES, perDotAt, hookPoint } from './story.js';
 import { lon2x, lat2y } from './camera.js';
 import { prog, lerp, ease, env, spring, fmtInt, fmtPct } from './util.js';
 
@@ -130,19 +130,20 @@ export function createOverlay(stage, L) {
     const lg = b.appendChild(h('div', 'legend', legend));
     return { b, hd, sb, lg };
   };
+  // \u00a0 keeps place names on one line (words() splits on spaces).
   const fly = lens('', 'Aproxime e cada ponto vira *35 pessoas*.', 'Do país inteiro ao seu bairro.', '', '#202124');
-  const rRace = lens('Cor ou raça', 'Zona Sul: quase *8 em cada 10* são brancos.', 'Na Baixada Fluminense, 1 em cada 3.', chips(RACE_ROWS), PALETTE.race[1]);
+  const rRace = lens('Cor ou raça', 'Zona\u00a0Sul: *3 em cada 4* são brancos.', 'Na Baixada\u00a0Fluminense, 1 em cada 3.', chips(RACE_ROWS), PALETTE.race[1]);
   const rInc = lens(
     'Renda',
     'A renda segue *a mesma fronteira.*',
-    'Zona Sul: mais de 5 salários mínimos. Baixada: até 2.',
+    'Renda típica: mais de 5 salários mínimos na Zona\u00a0Sul, até 2 na Baixada.',
     `<div class="ramp">${PALETTE.income.slice(0, 6).map((c) => `<i style="background:${c}"></i>`).join('')}</div><div class="ramp-labels"><span>até 1</span><span>salários mínimos</span><span>10+</span></div>`,
     PALETTE.income[5],
   );
   const rRel = lens(
     'Religião',
-    'Evangélicos: *4 em cada 10* na Zona Oeste.',
-    'Na Zona Sul, 1 em cada 10.',
+    'Evangélicos: quase *4 em cada 10* na Zona\u00a0Oeste.',
+    'Na Zona\u00a0Sul, menos de 1 em cada 10.',
     chips([['Católica', PALETTE.religion[0]], ['Evangélicas', PALETTE.religion[1]], ['Sem religião', PALETTE.religion[2]], ['Outras', PALETTE.religion[6]]]),
     PALETTE.religion[1],
   );
@@ -181,15 +182,17 @@ export function createOverlay(stage, L) {
     geo ||= lensGeo();
     // Scrim keeps copy legible once dots go full-bleed.
     scrim.style.opacity = 0.35 + 0.6 * ease.inOutSine(prog(t, T.fly[0] + 0.6, T.fly[1] - 0.2)) - 0.95 * ease.inOutSine(prog(t, T.outro, T.outro + 0.5));
-    fade(brand, t, 0.9, T.outro + 0.2, { dy: -10 });
-    fade(source, t, 1.2, 15.2, { dy: 0 });
+    fade(brand, t, T.burst[0] + 0.1, T.outro + 0.2, { dy: -10 });
+    fade(source, t, T.burst[0] + 0.4, DURATION + 0.2, { dy: 0 });
 
     // Hook.
     const s = spring(t - 0.05, { freq: 1.6, damping: 0.5 });
     const shrink = ease.inCubic(prog(t, T.burst[0] - 0.05, T.burst[0] + 0.14));
-    hookDot.style.transform = `translate(-50%, -50%) scale(${Math.max(0, s * (1 - shrink))})`;
+    // A slow heartbeat while the viewer reads, gathering just before the burst.
+    const beat = 1 + 0.07 * Math.sin((2 * Math.PI * t) / 0.9) * prog(t, 0.5, 0.9) - 0.12 * ease.inCubic(prog(t, T.burst[0] - 0.4, T.burst[0] - 0.05));
+    hookDot.style.transform = `translate(-50%, -50%) scale(${Math.max(0, s * beat * (1 - shrink))})`;
     hookDot.style.opacity = t < T.burst[0] + 0.15 ? 1 : 0;
-    animWords(hookText, t, 0.16, T.hook[1] - 0.02, { stagger: 0.06 });
+    animWords(hookText, t, 0.25, T.hook[1] - 0.02, { stagger: 0.14 });
     rings.forEach((r, i) => {
       const p = prog(t, T.burst[0] + i * 0.09, T.burst[0] + i * 0.09 + 0.9);
       r.style.visibility = p > 0 && p < 1 ? 'visible' : 'hidden';
@@ -198,11 +201,11 @@ export function createOverlay(stage, L) {
     });
 
     // Intro counter.
-    animWords(introSub, t, 1.45, T.chartIn[0] - 0.12);
-    fade(introKick, t, 1.2, T.chartIn[0] - 0.2, { dy: 10 });
-    const cp = ease.outQuint(prog(t, 1.1, 2.45));
+    animWords(introSub, t, T.burst[0] + 0.7, T.chartIn[0] - 0.12);
+    fade(introKick, t, T.burst[0] + 0.4, T.chartIn[0] - 0.2, { dy: 10 });
+    const cp = ease.outQuint(prog(t, T.burst[0] + 0.3, T.burst[0] + 1.8));
     counter.innerHTML = digits(fmtInt(203080756 * cp));
-    fade(counter, t, 1.2, T.chartIn[0] - 0.1, { dy: 30, dur: 0.6 });
+    fade(counter, t, T.burst[0] + 0.4, T.chartIn[0] - 0.1, { dy: 30, dur: 0.6 });
     intro.style.visibility = t < T.chartIn[0] + 0.4 ? 'visible' : 'hidden';
 
     // Race chart.
@@ -220,20 +223,22 @@ export function createOverlay(stage, L) {
 
     // Search.
     const typed = 'Rio de Janeiro';
-    const n = Math.round(typed.length * prog(t, T.search[0] + 0.14, T.search[0] + 0.48));
+    // Typed at a human pace so the viewer reads the place before the fly.
+    const S0 = T.search[0];
+    const n = Math.round(typed.length * prog(t, S0 + 0.3, S0 + 0.95));
     searchQ.textContent = n ? typed.slice(0, n) : '';
     searchQ.classList.toggle('ph', n === 0);
     if (n === 0) searchQ.textContent = 'Buscar lugar';
-    caret.style.opacity = Math.floor(t * 4) % 2 === 0 || (t > T.search[0] + 0.1 && t < T.search[0] + 0.5) ? 1 : 0;
-    const press = Math.sin(Math.PI * prog(t, T.search[0] + 0.56, T.search[0] + 0.66));
+    caret.style.opacity = Math.floor(t * 4) % 2 === 0 || (t > S0 + 0.25 && t < S0 + 1.0) ? 1 : 0;
+    const press = Math.sin(Math.PI * prog(t, S0 + 1.2, S0 + 1.3));
     const sIn = spring(t - T.search[0], { freq: 2, damping: 0.62 });
     const sOut = ease.inCubic(prog(t, T.search[1] - 0.12, T.search[1] + 0.18));
     search.style.opacity = t < T.search[0] ? 0 : 1 - sOut;
     search.style.transform = `translate3d(0, ${(1 - sIn) * 30 - sOut * 20}px, 0) scale(${0.96 + 0.04 * sIn - 0.02 * press})`;
     search.style.visibility = t > T.search[0] && t < T.search[1] + 0.2 ? 'visible' : 'hidden';
-    searchResult.style.opacity = ease.outCubic(prog(t, T.search[0] + 0.42, T.search[0] + 0.52));
-    searchResult.classList.toggle('on', t > T.search[0] + 0.56);
-    searchPill.classList.toggle('focus', t > T.search[0] + 0.08);
+    searchResult.style.opacity = ease.outCubic(prog(t, S0 + 0.9, S0 + 1.0));
+    searchResult.classList.toggle('on', t > S0 + 1.2);
+    searchPill.classList.toggle('focus', t > S0 + 0.15);
 
     // Rio copy.
     fade(rioKick, t, T.fly[0] + 0.15, T.outro, { dy: 10 });
@@ -325,7 +330,7 @@ export function createOverlay(stage, L) {
     ripple.style.opacity = rp > 0 ? 0.5 * (1 - rp) : 0;
 
     // Outro lockup under the dot wordmark.
-    animWords(tagline, t, T.word[1] - 0.25, 16, { stagger: 0.04 });
+    animWords(tagline, t, T.word[1] - 0.25, DURATION + 1, { stagger: 0.04 });
     const uIn = spring(t - (T.word[1] - 0.05), { freq: 1.7, damping: 0.6 });
     url.style.opacity = t > T.word[1] - 0.05 ? Math.min(1, uIn * 1.4) : 0;
     url.style.transform = `translate(-50%, 0) translate3d(0, ${(1 - uIn) * 26}px, 0)`;

@@ -1,28 +1,29 @@
-// The 15-second storyboard: camera path, dot layers and morph targets as a
-// pure function of time. Copy and numbers live in overlay.js.
+// The storyboard: camera path, dot layers and morph targets as a pure
+// function of time. Copy and numbers live in overlay.js.
 import { makeView, fitBounds, flyPath, lon2x, lat2y } from './camera.js';
 import { prog, lerp, ease, mulberry32 } from './util.js';
 
-export const DURATION = 15;
-
 // Beat sheet (seconds), locked to a 133⅓ BPM grid (0.45 s beats) that
 // starts on the burst, so every cut lands on a downbeat of the soundtrack.
+// Paced for reading, not for the scroll: every headline stays up for ~5 s
+// (12 beats), the fly is slow enough to follow, and the address holds ~3 s.
 export const BEAT = 0.45;
-export const GRID0 = 0.8;
+export const GRID0 = 1.8;
 const b = (n) => +(GRID0 + n * BEAT).toFixed(3);
 export const T = {
-  hook: [0, 0.8],
-  burst: [b(0), 2.3],
-  chartIn: [b(4), b(4) + 1.05],
-  chartOut: [b(8), b(8) + 0.85],
-  search: [b(8), b(10)],
-  fly: [b(10), b(14)],
-  race: b(14),
-  income: [b(18), b(18) + 0.65],
-  religion: [b(22), b(22) + 0.65],
-  outro: b(26),
-  word: [b(26) + 0.2, b(29)],
+  hook: [0, b(0)],
+  burst: [b(0), b(0) + 1.6],
+  chartIn: [b(8), b(8) + 1.2],
+  chartOut: [b(20), b(20) + 1.0],
+  search: [b(20), b(24)],
+  fly: [b(24), b(32)],
+  race: b(32),
+  income: [b(44), b(44) + 0.8],
+  religion: [b(56), b(56) + 0.8],
+  outro: b(68),
+  word: [b(68) + 0.2, b(72)],
 };
+export const DURATION = +(b(78) + 0.1).toFixed(2);
 
 export const PALETTE = {
   race: ['#e41a1c', '#4daf4a', '#ff7f00', '#984ea3', '#377eb8'],
@@ -58,7 +59,7 @@ export function layoutFor(W, H) {
     W, H, portrait: true,
     brazilRect: [50, 760, 1030, 1640],
     rio: { lon: -43.36, lat: -22.87, zoom: 9.95, px: 560, py: 1180 },
-    chart: { x: 80, y: 660, rowH: 96, labelW: 190, barW: 600, barH: 56, pitch: 2.8 },
+    chart: { x: 80, y: 660, rowH: 100, labelW: 222, barW: 580, barH: 56, pitch: 2.8 },
     word: { x: W / 2, y: H * 0.4, size: 250 },
     hook: [W / 2 - 140, H * 0.46],
     topFade: 0.42,
@@ -73,8 +74,8 @@ export function cameraAt(t, L) {
   // Intro: open centred on the hook dot (Brasília), then drift so Brazil
   // settles right of the copy; a slow push continues under the chart.
   const H0 = { x: lon2x(BRASILIA[0]), y: lat2y(BRASILIA[1]), zoom: N.zoom + 0.32, px: L.hook[0], py: L.hook[1] };
-  const k0 = ease.inOutCubic(prog(t, T.burst[0] - 0.05, 1.8));
-  const push = prog(t, 2.0, T.fly[0]) * 0.07;
+  const k0 = ease.inOutCubic(prog(t, T.burst[0] - 0.05, T.burst[0] + 1.1));
+  const push = prog(t, T.burst[0] + 1.2, T.fly[0]) * 0.07;
   const national = {
     x: lerp(H0.x, N.x, k0), y: lerp(H0.y, N.y, k0), px: lerp(H0.px, N.px, k0), py: lerp(H0.py, N.py, k0),
     zoom: lerp(H0.zoom, N.zoom, k0) + push, bearing: 0, pitch: 0,
@@ -96,7 +97,7 @@ export function cameraAt(t, L) {
 
   // Rio: a continuous slow orbit so the three lenses never sit still.
   const d = ease.inOutSine(prog(t, T.fly[1], DURATION));
-  return { ...cam, zoom: R.zoom + 0.42 * d, pitch: 30 + 8 * d, bearing: -14 + 20 * d };
+  return { ...cam, zoom: R.zoom + 0.5 * d, pitch: 30 + 8 * d, bearing: -14 + 24 * d };
 }
 const national0 = (N) => ({ ...N, zoom: N.zoom + 0.07 });
 
@@ -201,7 +202,7 @@ export function layersAt(t, L, cam) {
 }
 
 export function landAlpha(t, cam) {
-  return ease.outCubic(prog(t, 0.9, 1.9)) * (1 - prog(cam.zoom, 5.6, 7.2));
+  return ease.outCubic(prog(t, T.burst[0] + 0.1, T.burst[0] + 1.1)) * (1 - prog(cam.zoom, 5.6, 7.2));
 }
 
 // ---------- morph targets (screen px, flag) ----------

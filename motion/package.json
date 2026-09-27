@@ -1,7 +1,7 @@
 {
   "name": "dotsbr-motion",
   "version": "1.0.0",
-  "description": "dotsbr 15s motion graphics: real Censo 2022 dots in WebGL, captured frame by frame",
+  "description": "dotsbr motion graphics (37 s): real Censo 2022 dots in WebGL, captured frame by frame",
   "private": true,
   "license": "UNLICENSED",
   "type": "module",
@@ -9,9 +9,9 @@
     "data": "node scripts/extract.mjs",
     "stats": "node scripts/stats.mjs race 10 && node scripts/rio_stats.mjs",
     "sound": "node scripts/soundtrack.mjs",
-    "render": "node scripts/render.mjs",
-    "render:vertical": "node scripts/render.mjs --w 1080 --h 1920",
-    "stills": "node scripts/render.mjs --stills 0.5,1.6,3.8,5,6.4,8.2,10.2,12,14.9"
+    "render": "node scripts/render.mjs --workers 2 --target-mib 28.5",
+    "render:vertical": "node scripts/render.mjs --workers 2 --target-mib 28.5 --w 1080 --h 1920",
+    "stills": "node scripts/render.mjs --stills 1.2,2.9,4.6,8,11.9,14.6,19,24.5,30,33.4,35.8"
   },
   "devDependencies": {
     "@mapbox/vector-tile": "^1.3.1",
