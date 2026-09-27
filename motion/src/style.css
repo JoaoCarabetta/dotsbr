@@ -194,3 +194,30 @@ body.render { background: var(--paper); overflow: hidden; }
 .controls { display: flex; align-items: center; gap: 12px; padding: 10px 14px; color: #ddd; font: 13px/1 ui-monospace, monospace; }
 .controls input[type=range] { flex: 1; }
 .controls button { font: inherit; padding: 6px 10px; }
+
+/* Election shorts (src/stories/*, stage.short) */
+.short .hook-dot { width: 58px; height: 58px; }
+.short .story-block .headline { margin-top: 18px; }
+.story-block.center { text-align: center; }
+.story-block.center .kicker, .story-block.center .legend { justify-content: center; }
+.fine { margin-top: 18px; font: 500 22px/1.35 Inter; color: var(--muted); }
+.portrait .fine { font-size: 27px; }
+.hook-cap { transform: translate(-50%, 0); font: 600 30px/1 Inter; color: var(--muted); white-space: nowrap; }
+.bracket { width: 26px; border: 4px solid; border-left: 0; border-radius: 0 14px 14px 0; transform-origin: 50% 50%; }
+.bracket-label { font-family: 'Instrument Serif', Georgia, serif; font-size: 110px; line-height: 1; white-space: nowrap; }
+.title-card {
+  inset: 0; z-index: 6; background: var(--ink); color: var(--paper);
+  display: flex; flex-direction: column; justify-content: center; padding: 0 80px;
+}
+.title-card .uf { font: 650 30px/1 Inter; letter-spacing: 0.22em; text-transform: uppercase; color: #9a9d95; }
+.title-card .city { margin-top: 20px; font-family: 'Instrument Serif', Georgia, serif; font-size: 200px; line-height: 0.92; letter-spacing: -0.02em; }
+.legend-bar {
+  left: var(--col-x); display: flex; flex-wrap: wrap; gap: 14px 26px; margin: 0;
+  background: rgba(255, 255, 255, 0.9); padding: 16px 26px; border-radius: 40px; box-shadow: var(--shadow);
+}
+.ruler { left: 0; top: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25)); }
+.ruler-label {
+  left: 0; top: 0; background: var(--ink); color: #fff; font-family: 'Instrument Serif', Georgia, serif; font-size: 72px; line-height: 1;
+  padding: 12px 26px 16px; border-radius: 22px; white-space: nowrap; transform-origin: 50% 100%;
+}
+.pin-tag { left: 0; top: 0; background: #fff; color: var(--ink); font: 650 28px/1 Inter; padding: 12px 18px; border-radius: 999px; box-shadow: var(--shadow); white-space: nowrap; }

@@ -28,6 +28,8 @@ uniform vec4 u_wipe;
 uniform float u_wipeJitter;
 uniform float u_wipePop;
 uniform vec2 u_topFade;
+uniform float u_ufAlpha[27];
+uniform vec4 u_reveal;
 out vec4 v_color;
 out float v_size;
 
@@ -44,7 +46,8 @@ void main() {
   uint id = uint(gl_VertexID);
   float r1 = rnd(id, 1u), r2 = rnd(id, 2u), r3 = rnd(id, 3u);
   int cat = int(a_meta.x + 0.5);
-  float alpha = u_alpha * u_catAlpha[cat];
+  // a_meta.y is the dot's UF (index into extract.mjs UFS): lights a region.
+  float alpha = u_alpha * u_catAlpha[cat] * u_ufAlpha[int(a_meta.y + 0.5)];
   // Dither crossfade: each dot owns a threshold, so fading a level in or
   // out adds/removes whole dots instead of blending a grey mush.
   float vis = clamp((u_fade - r1) / 0.03 + 0.5, 0.0, 1.0);
@@ -81,6 +84,8 @@ void main() {
   }
 
   alpha *= smoothstep(u_topFade.x, u_topFade.y, px.y);
+  // Circular reveal (x, y, radius, softness): dots exist only inside it.
+  if (u_reveal.z > 0.0) alpha *= 1.0 - smoothstep(u_reveal.z - u_reveal.w, u_reveal.z, distance(px, u_reveal.xy));
   size *= pop;
 
   // Sub-1.6px dots keep their coverage through alpha instead of aliasing.
@@ -215,6 +220,11 @@ export class Dots {
     gl.uniform1f(L.u_wipeJitter, w ? w.jitter ?? 120 : 0);
     gl.uniform1f(L.u_wipePop, w ? w.pop ?? 1.2 : 0);
     gl.uniform2f(L.u_topFade, o.topFade ? o.topFade[0] : -1e6, o.topFade ? o.topFade[1] : -1e6 + 1);
+    const ufa = new Float32Array(27).fill(1);
+    if (o.ufAlpha) o.ufAlpha.forEach((a, i) => (ufa[i] = a));
+    gl.uniform1fv(L.u_ufAlpha, ufa);
+    const rv = o.reveal;
+    gl.uniform4f(L.u_reveal, rv ? rv[0] : 0, rv ? rv[1] : 0, rv ? rv[2] : 0, rv ? rv[3] : 1);
     gl.drawArrays(gl.POINTS, 0, set.count);
   }
 }

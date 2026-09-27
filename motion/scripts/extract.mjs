@@ -54,6 +54,37 @@ export const DATASETS = [
   box('rio_race_11', 'race', 11, RIO),
   box('rio_income_11', 'income', 11, RIO),
   box('rio_religion_11', 'religion', 11, RIO),
+
+  // Election shorts (src/stories/*): national income/religion, and the fly
+  // chains each short needs, cut to what its portrait camera can see.
+  all('income', 5),
+  all('income', 6),
+  all('religion', 5),
+  all('religion', 6),
+  // bolso: Brasil → Brasília (renda)
+  box('df_income_7', 'income', 7, [-55, -24, -41, -8]),
+  box('df_income_8', 'income', 8, [-51.5, -19.8, -44.5, -11.8]),
+  box('df_income_9', 'income', 9, [-49.6, -17.8, -46.4, -13.8]),
+  box('df_income_10', 'income', 10, [-48.8, -16.6, -47.2, -14.9]),
+  box('df_income_11', 'income', 11, [-48.5, -16.2, -47.45, -15.35]),
+  // fe: Brasil → Rio (religião)
+  box('rio_religion_7', 'religion', 7, [-58, -32, -30, -12]),
+  box('rio_religion_8', 'religion', 8, [-51, -28, -36, -17]),
+  box('rio_religion_9', 'religion', 9, [-47.5, -25.5, -39.5, -20]),
+  box('rio_religion_10', 'religion', 10, [-45.5, -24.2, -41.5, -21.4]),
+  // duascores + seuestado: Brasil → São Paulo (raça)
+  box('sp_race_7', 'race', 7, [-58, -34, -35, -12]),
+  box('sp_race_8', 'race', 8, [-52, -28.5, -41, -18.5]),
+  box('sp_race_9', 'race', 9, [-49.2, -25.8, -44, -21.2]),
+  box('sp_race_10', 'race', 10, [-47.9, -24.6, -45.3, -22.4]),
+  box('sp_race_11', 'race', 11, [-47.3, -24.2, -45.95, -22.9]),
+  // seuestado: the other capitals of the tour
+  box('manaus_race_10', 'race', 10, [-60.9, -4.1, -59.1, -1.9]),
+  box('manaus_race_11', 'race', 11, [-60.5, -3.7, -59.55, -2.3]),
+  box('salvador_race_10', 'race', 10, [-39.3, -13.9, -37.6, -11.8]),
+  box('salvador_race_11', 'race', 11, [-38.9, -13.5, -38.0, -12.2]),
+  box('poa_race_10', 'race', 10, [-52.1, -31.1, -50.3, -28.9]),
+  box('poa_race_11', 'race', 11, [-51.65, -30.65, -50.7, -29.3]),
 ];
 
 const lon2x = (lon) => (lon + 180) / 360;

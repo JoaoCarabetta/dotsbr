@@ -1,20 +1,19 @@
-// Boot: load dots + land + fonts, then either play a live preview with a
-// scrubber, or (?render) expose window.renderFrame(t) to the capture script.
+// Boot: load a story (?story=, default the 37 s `main`), its dots, land and
+// fonts, then either play a live preview with a scrubber, or (?render)
+// expose window.renderFrame(t) to the capture script.
 import { Dots } from './dots.js';
 import { makeView } from './camera.js';
-import { layoutFor, cameraAt, layersAt, landAlpha, buildTargets, DURATION } from './story.js';
-import { createOverlay } from './overlay.js';
 
 const params = new URLSearchParams(location.search);
+const STORY = params.get('story') || 'main';
 const W = Number(params.get('w')) || 1920;
 const H = Number(params.get('h')) || 1080;
 const RENDER = params.has('render');
-const L = layoutFor(W, H);
+let DURATION = 0; // set by the story; the preview scrubber reads it
 
 const stage = document.getElementById('stage');
 stage.style.width = `${W}px`;
 stage.style.height = `${H}px`;
-stage.classList.toggle('portrait', L.portrait);
 if (RENDER) document.body.classList.add('render');
 
 const landCanvas = document.getElementById('land');
@@ -25,9 +24,12 @@ const landCtx = landCanvas.getContext('2d');
 // Fade via CSS opacity: a 2D canvas that is only clearRect()'d is not
 // re-sent to the compositor in headless Chromium, so the last drawn land
 // would linger under the city frames.
-function drawLand(rings, view, alpha) {
-  landCanvas.style.opacity = alpha;
-  if (alpha <= 0) return;
+// `spec` is an alpha, or { alpha, ink, hole: [x, y, r] } when a story paints
+// Brazil as a solid silhouette and opens a hole in it.
+function drawLand(rings, view, spec) {
+  const o = typeof spec === 'number' ? { alpha: spec } : spec;
+  landCanvas.style.opacity = o.alpha;
+  if (o.alpha <= 0) return;
   landCtx.clearRect(0, 0, W, H);
   for (const pass of [0, 1]) {
     for (const r of rings) {
@@ -38,27 +40,53 @@ function drawLand(rings, view, alpha) {
         i ? landCtx.lineTo(x, y) : landCtx.moveTo(x, y);
       }
       landCtx.closePath();
-      landCtx.fillStyle = pass ? '#fdfdfb' : '#f6f5f1';
+      landCtx.fillStyle = pass ? o.brazil || '#fdfdfb' : o.others || '#f6f5f1';
       landCtx.fill();
       landCtx.lineWidth = pass ? 1.4 : 1;
-      landCtx.strokeStyle = pass ? '#d8d6ce' : '#e2e0d9';
+      landCtx.strokeStyle = pass ? o.brazilStroke || '#d8d6ce' : '#e2e0d9';
       landCtx.stroke();
     }
+  }
+  // Ink cover over Brazil, clipped to everything outside the hole, so the
+  // ordinary land shows through the opening with no pop when it ends.
+  if (o.ink) {
+    landCtx.save();
+    if (o.hole && o.hole[2] > 0) {
+      landCtx.beginPath();
+      landCtx.rect(0, 0, W, H);
+      landCtx.arc(o.hole[0], o.hole[1], o.hole[2], 0, Math.PI * 2, true);
+      landCtx.clip('evenodd');
+    }
+    for (const r of rings) {
+      if (!r.br) continue;
+      landCtx.beginPath();
+      for (let i = 0; i < r.pts.length; i += 2) {
+        const [x, y] = view.project(r.pts[i], r.pts[i + 1]);
+        i ? landCtx.lineTo(x, y) : landCtx.moveTo(x, y);
+      }
+      landCtx.closePath();
+      landCtx.fillStyle = o.ink;
+      landCtx.fill();
+      landCtx.lineWidth = 1.4;
+      landCtx.strokeStyle = o.ink;
+      landCtx.stroke();
+    }
+    landCtx.restore();
   }
 }
 
 // Glyph samples for the dot wordmark (Inter 800, jittered grid).
-function sampleGlyphs(Lay) {
+function sampleGlyphs(Lay, spec = Lay.word) {
   const c = document.createElement('canvas');
   c.width = Lay.W;
   c.height = Lay.H;
   const ctx = c.getContext('2d');
-  ctx.font = `800 ${Lay.word.size}px Inter`;
-  ctx.letterSpacing = `${-0.045 * Lay.word.size}px`;
+  ctx.font = `800 ${spec.size}px Inter`;
+  ctx.letterSpacing = `${-0.045 * spec.size}px`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#000';
-  ctx.fillText('dotsbr', Lay.word.x, Lay.word.y);
+  ctx.fillText(spec.text || 'dotsbr', spec.x, spec.y);
   const img = ctx.getImageData(0, 0, Lay.W, Lay.H).data;
   const pitch = Lay.portrait ? 3.2 : 3.0;
   const out = [];
@@ -82,25 +110,31 @@ async function boot() {
     document.fonts.load('500 20px Inter'),
     document.fonts.load('800 20px Inter'),
   ]);
+  const story = (await import(`./stories/${STORY}.js`)).default;
+  const L = story.layout(W, H);
+  stage.classList.toggle('portrait', L.portrait);
   const manifest = await (await fetch('data/manifest.json')).json();
   const dots = new Dots(document.getElementById('gl'), { W, H });
   dots.SCALE = manifest.scale;
+  const missing = story.datasets.filter((n) => !manifest.datasets[n]);
+  if (missing.length) throw new Error(`missing datasets (npm run data): ${missing.join(', ')}`);
   await Promise.all(
-    Object.values(manifest.datasets).map(async (m) => {
+    story.datasets.map(async (name) => {
+      const m = manifest.datasets[name];
       const buf = await (await fetch(`data/${m.name}.bin`)).arrayBuffer();
       dots.add(m.name, m, buf);
     }),
   );
   const land = await (await fetch('data/land.json')).json();
-  const info = buildTargets(dots, L, sampleGlyphs);
-  const overlay = createOverlay(stage, L);
+  const info = story.targets(dots, L, { sampleGlyphs });
+  const overlay = story.overlay(stage, L);
 
   const renderAt = (t) => {
-    const cam = cameraAt(t, L);
+    const cam = story.camera(t, L);
     const view = makeView(cam, W, H);
-    drawLand(land, view, landAlpha(t, cam));
+    drawLand(land, view, story.land(t, cam, L, view));
     dots.clear();
-    for (const layer of layersAt(t, L, cam)) dots.draw(view, manifest.scale, layer);
+    for (const layer of story.layers(t, L, cam, view)) dots.draw(view, manifest.scale, layer);
     overlay(t, view, cam);
   };
 
@@ -109,7 +143,8 @@ async function boot() {
     dots.gl.finish();
     return true;
   };
-  window.DURATION = DURATION;
+  window.DURATION = story.duration;
+  DURATION = story.duration;
   window.info = info;
 
   if (RENDER) {
