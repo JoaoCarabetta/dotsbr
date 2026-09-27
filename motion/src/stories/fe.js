@@ -1,10 +1,11 @@
-// Short 4 — "O voto evangélico" (religião). Every campaign courts it; the
-// census shows it is more than 1 in 4 Brazilians (10+), nearly 4 in 10 in
-// the Norte, and inside Rio it swings from nearly 4 in 10 in Campo Grande
-// and Santa Cruz to under 1 in 10 in Copacabana, Ipanema and Leblon.
+// Short 4 — "O voto evangélico" (religião). There is a candidate who acts
+// as its owner; the census shows who it is: more than 1 in 4 Brazilians
+// (10+), nearly 8 in 10 of them where the typical income is up to 2 minimum
+// wages (scripts/cross_stats.mjs), and inside Rio nearly 4 in 10 in Campo
+// Grande and Santa Cruz against under 1 in 10 from Copacabana to Leblon.
 // Religion is a sample estimate mixed per group of neighbourhoods, so the
 // copy says so and never quotes a single street.
-import { portraitLayout, national, regionMask, place, fly, drift, lod, dotSize, topFade, landAtZoom, LEGEND, PALETTE, grid } from '../kit/scene.js';
+import { portraitLayout, national, place, fly, drift, lod, dotSize, topFade, landAtZoom, LEGEND, PALETTE, grid } from '../kit/scene.js';
 import * as UI from '../kit/ui.js';
 import { chrome, setupBurst, setupWord, burstMorph, wordMorph, hookAt } from '../kit/shorts.js';
 import { prog, lerp, ease } from '../util.js';
@@ -17,8 +18,7 @@ const b = grid(GRID0, BEAT);
 const T = {
   burst: [b(0), b(0) + 1.6],
   solo: b(3),
-  norte: b(9),
-  nordeste: b(13),
+  work: b(9),
   fly: [b(17), b(23)],
   oeste: b(23),
   sul: b(28.5),
@@ -33,7 +33,7 @@ const CAMPO_GRANDE = [-43.561, -22.903];
 const COPACABANA = [-43.187, -22.971];
 
 function camera(t, L) {
-  const N = drift(national(L), t, [0, T.fly[0]], { zoom: 0.1 });
+  const N = drift(national(L), t, [0, T.fly[0]], { zoom: 0.18 });
   if (t < T.fly[0]) return N;
   return drift(fly(t, T.fly, N, RIO), t, [T.oeste, T.word[0]], { zoom: 0.3, bearing: 6 });
 }
@@ -50,14 +50,6 @@ function catAlpha(t) {
   return P.map((_, i) => (i === 1 ? 1 : d));
 }
 
-function mask(t) {
-  const no = ease.inOutCubic(prog(t, T.norte + 0.2, T.norte + 0.9)) * (1 - ease.inOutCubic(prog(t, T.nordeste, T.nordeste + 0.5)));
-  const ne = ease.inOutCubic(prog(t, T.nordeste + 0.2, T.nordeste + 0.8)) * (1 - ease.inOutCubic(prog(t, T.fly[0], T.fly[0] + 0.7)));
-  if (no > 0) return regionMask('Norte', no, 0.1);
-  if (ne > 0) return regionMask('Nordeste', ne, 0.1);
-  return null;
-}
-
 function layers(t, L, cam) {
   if (t < T.burst[0]) return [];
   const size = dotSize(cam.zoom);
@@ -66,8 +58,7 @@ function layers(t, L, cam) {
   if (t >= T.word[0]) return [{ ...base, ds: 'rio_religion_11', fade: 1, morph: wordMorph(t, T.word, L) }];
   const tf = topFade(cam, L);
   const ca = catAlpha(t);
-  const ufAlpha = mask(t);
-  return lod(cam.zoom, LEVELS).map(([ds, w]) => ({ ...base, ds, fade: w, catAlpha: ca, ufAlpha, topFade: tf }));
+  return lod(cam.zoom, LEVELS).map(([ds, w]) => ({ ...base, ds, fade: w, catAlpha: ca, topFade: tf }));
 }
 
 const land = (t, cam) => landAtZoom(cam.zoom) * ease.outCubic(prog(t, T.burst[0] + 0.1, T.burst[0] + 1.1)) * (1 - ease.inCubic(prog(t, T.word[0], T.word[0] + 0.5)));
@@ -82,14 +73,13 @@ function overlay(stage, L) {
   const r = UI.root(stage);
   const K = (s, c) => UI.kicker(s, c);
   const hookDot = UI.HookDot(r, hookAt(camera(0, L), L), EV, T.burst[0], '1 ponto = 790 pessoas');
-  const hook = UI.Block(r, { top: 230, kicker: K('Eleições 2026', EV), head: 'Todo candidato quer o *voto evangélico*.', color: EV, size: 108 });
+  const hook = UI.Block(r, { top: 230, kicker: K('Eleições 2026', EV), head: 'Tem candidato que se acha dono do *voto evangélico*.', color: EV, size: 108 });
   const intro = UI.Block(r, { top: 230, kicker: K('Religião · Censo 2022', EV), head: 'Evangélicos são *mais de 1 em cada 4* brasileiros.', fine: 'Pessoas com 10 anos ou mais.', color: EV, size: 104 });
   const legend = UI.Legend(r, LEGEND.religion);
-  const norte = UI.Block(r, { top: 230, kicker: K('Norte', EV), head: 'No Norte, *quase 4 em cada 10*.', color: EV, size: 108 });
-  const nordeste = UI.Block(r, { top: 230, kicker: K('Nordeste', EV), head: 'No Nordeste, *pouco mais de 2 em cada 10*.', color: EV, size: 108 });
+  const work = UI.Block(r, { top: 230, kicker: K('Religião e renda', EV), head: '*Quase 8 em cada 10* evangélicos moram onde a renda típica é de até 2 salários mínimos.', fine: 'Estimativa por vizinhança, cruzando religião e renda do Censo.', color: EV });
   const oeste = UI.Block(r, { top: 230, kicker: K('Rio de Janeiro · Zona Oeste', EV), head: 'Em Campo Grande e Santa Cruz, *quase 4 em cada 10*.', color: EV });
   const sul = UI.Block(r, { top: 230, kicker: K('Rio de Janeiro · Zona Sul', EV), head: 'Em Copacabana, Ipanema e Leblon, *menos de 1 em cada 10*.', fine: 'Religião estimada para conjuntos de bairros.', color: EV });
-  const punch = UI.Block(r, { top: 250, center: true, kicker: K('Eleições 2026', '#16181b'), head: 'Não é um bloco. *É um mapa.*', color: EV, size: 132 });
+  const punch = UI.Block(r, { top: 250, center: true, kicker: K('Eleições 2026', '#16181b'), head: 'O voto evangélico é voto de trabalhador. *E não tem dono.*', color: EV, size: 100 });
   const pins = UI.Pins(r, [
     { key: 'oeste', name: 'Campo Grande', lon: CAMPO_GRANDE[0], lat: CAMPO_GRANDE[1] },
     { key: 'sul', name: 'Copacabana', lon: COPACABANA[0], lat: COPACABANA[1] },
@@ -98,10 +88,9 @@ function overlay(stage, L) {
   return (t, view) => {
     hookDot(t);
     hook(t, 0.15, T.burst[0] - 0.1);
-    intro(t, T.burst[0] + 0.5, T.norte - 0.1);
+    intro(t, T.burst[0] + 0.5, T.work - 0.1);
     legend(t, T.burst[0] + 1.2, T.word[0] - 0.3);
-    norte(t, T.norte + 0.05, T.nordeste - 0.1);
-    nordeste(t, T.nordeste + 0.05, T.fly[0] + 0.3);
+    work(t, T.work + 0.05, T.fly[0] + 0.3);
     oeste(t, T.oeste - 0.3, T.sul - 0.1);
     sul(t, T.sul + 0.05, T.punch - 0.1);
     pins(t, view, { oeste: [T.oeste - 0.2, T.sul + 0.2], sul: [T.sul + 0.1, T.punch] });
@@ -114,14 +103,14 @@ export const cues = {
   duration: DURATION, beat: BEAT, grid0: GRID0, key: 'F#', progression: ['i', 'VI', 'VII', 'i'],
   sections: [
     { a: 0, b: T.burst[0], drums: 0, plucks: 0 },
-    { a: T.burst[0], b: T.norte, drums: 0, plucks: 2 },
-    { a: T.norte, b: T.fly[0], drums: 1, plucks: 2 },
+    { a: T.burst[0], b: T.work, drums: 0, plucks: 2 },
+    { a: T.work, b: T.fly[0], drums: 1, plucks: 2 },
     { a: T.fly[0], b: T.punch, drums: 2, plucks: 4 },
     { a: T.punch, b: T.word[0] - 0.2, drums: 3, plucks: 4, bright: true },
   ],
   hits: [
     { type: 'hook', t: 0.1 }, { type: 'burst', t: T.burst[0], until: T.burst[1] },
-    { type: 'tick', t: T.norte }, { type: 'tick', t: T.nordeste },
+    { type: 'tick', t: T.work },
     { type: 'riser', t: T.fly[0] - 1.2, until: T.fly[0] + 0.2 },
     { type: 'whoosh', t: T.fly[0], from: 0.6, to: -0.6 },
     { type: 'tick', t: T.sul },

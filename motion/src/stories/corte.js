@@ -1,7 +1,8 @@
-// Short 3 — "O seu bolso" (renda). Every campaign promises to touch your
-// pocket. 3 in 4 homes sit where the typical income is up to 2 minimum
-// wages; 4 in 100 where it passes 5. Then Brasília: the Plano Piloto and
-// Ceilândia, 26 km apart in a straight line.
+// Short 3 — "O corte" (renda). There is a candidate promising to cut public
+// spending: this is who lives with it. 3 in 4 homes sit where the typical
+// income is up to 2 minimum wages; 4 in 100 where it passes 5. Then
+// Brasília: the Plano Piloto and Ceilândia, 26 km apart in a straight line
+// — the distance between where a cut is decided and where it is felt.
 import { portraitLayout, national, place, fly, drift, lod, dotSize, topFade, landAtZoom, PALETTE, grid } from '../kit/scene.js';
 import * as UI from '../kit/ui.js';
 import { chrome, setupBurst, setupWord, burstMorph, wordMorph, hookAt } from '../kit/shorts.js';
@@ -75,16 +76,16 @@ function overlay(stage, L) {
   stage.classList.add('short');
   const r = UI.root(stage);
   const K = (s, c) => UI.kicker(s, c);
-  const ramp = UI.rampHtml(P.slice(0, 6), ['Até 1 salário mínimo', '', 'Mais de 10']);
+  const ramp = UI.rampHtml(P.slice(0, 6), ['Até 1 salário mínimo', '', 'Mais de 10'], 'Renda típica da vizinhança');
   const hookDot = UI.HookDot(r, hookAt(camera(0, L), L), P[0], T.burst[0], '1 ponto = 300 lares');
-  const hook = UI.Block(r, { top: 230, kicker: K('Eleições 2026', P[0]), head: 'Todo candidato promete mexer no *seu bolso*.', color: P[0], size: 108 });
+  const hook = UI.Block(r, { top: 230, kicker: K('Eleições 2026', P[0]), head: 'Tem candidato prometendo *cortar gastos* do governo.', color: P[0], size: 108 });
   const intro = UI.Block(r, { top: 230, kicker: K('Censo Demográfico 2022', P[0]), head: 'O Brasil tem *72 milhões* de lares.', sub: 'A cor mostra a renda típica de quem chefia as casas da vizinhança.', color: P[0], size: 108 });
   const legend = UI.Legend(r, ramp);
   const poor = UI.Block(r, { top: 230, kicker: K('Renda da vizinhança', P[0]), head: '*3 em cada 4* lares ficam onde a renda típica é de até 2 salários mínimos.', color: P[0] });
   const rich = UI.Block(r, { top: 230, kicker: K('Renda da vizinhança', P[5]), head: 'Só *4 em cada 100* estão onde ela passa de 5.', color: P[5], size: 108 });
   const plano = UI.Block(r, { top: 230, kicker: K('Brasília · Plano Piloto', P[5]), head: '*Quase 9 em cada 10* lares ficam onde a renda típica passa de 5 salários.', color: P[5] });
   const ceil = UI.Block(r, { top: 230, kicker: K('Brasília · Ceilândia', P[0]), head: '*3 em cada 4* ficam onde ela é de até 2.', color: P[0], size: 108 });
-  const punch = UI.Block(r, { top: 230, center: true, kicker: K('Eleições 2026', '#16181b'), head: 'Da Esplanada dos Ministérios a Ceilândia: *26\u00a0km*.', sub: '*E outro Brasil.*', color: P[0], size: 100, subSize: 64 });
+  const punch = UI.Block(r, { top: 230, center: true, kicker: K('Eleições 2026', '#16181b'), head: 'Da Esplanada dos Ministérios a Ceilândia: *26\u00a0km*.', sub: 'A distância entre quem decide o corte *e quem sente.*', color: P[0], size: 96, subSize: 54 });
   const pins = UI.Pins(r, [
     { key: 'plano', name: 'Plano Piloto', lon: PLANO[0], lat: PLANO[1] },
     { key: 'ceil', name: 'Ceilândia', lon: CEILANDIA[0], lat: CEILANDIA[1] },

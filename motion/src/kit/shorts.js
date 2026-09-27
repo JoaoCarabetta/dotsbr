@@ -35,9 +35,9 @@ export function wordMorph(t, [a, b], L) {
 }
 
 // Brand bug, source line and the outro lockup, timed from the story's beats.
-export function chrome(r, L, { brandIn, brandOut, sourceIn, duration, outroAt, cta }) {
+export function chrome(r, L, { brandIn, brandOut, sourceIn, duration, outroAt, cta, source: sourceText }) {
   const brand = UI.Brand(r);
-  const source = UI.Source(r);
+  const source = UI.Source(r, sourceText);
   const outro = UI.Outro(r, L, { tagline: 'Veja o seu bairro no mapa', cta });
   return (t) => {
     brand(t, brandIn, brandOut);

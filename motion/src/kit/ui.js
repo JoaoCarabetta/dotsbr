@@ -40,8 +40,8 @@ export function Block(r, { top = 200, kicker, head, sub, fine, legend, color = '
 
 export const kicker = (text, color = '#e41a1c') => `<i style="background:${color}"></i>${text}`;
 export const legendHtml = (items) => chips(items);
-export function rampHtml(colors, [lo, mid, hi]) {
-  return `<div class="ramp">${colors.map((c) => `<i style="background:${c}"></i>`).join('')}</div><div class="ramp-labels"><span>${lo}</span><span>${mid}</span><span>${hi}</span></div>`;
+export function rampHtml(colors, [lo, mid, hi], title) {
+  return `${title ? `<div class="ramp-title">${title}</div>` : ''}<div class="ramp">${colors.map((c) => `<i style="background:${c}"></i>`).join('')}</div><div class="ramp-labels"><span>${lo}</span><span>${mid}</span><span>${hi}</span></div>`;
 }
 
 // The single dot the story opens on: pops, breathes, then becomes the burst.
@@ -135,24 +135,6 @@ export function Bracket(r, { x, y0, y1, text, color }) {
   };
 }
 
-// Full-frame ink card that sweeps across on a cut, carrying the place name.
-export function TitleCard(r, L, cards) {
-  const el = r.appendChild(h('div', 'title-card', `<div class="uf"></div><div class="city"></div>`));
-  const uf = el.querySelector('.uf');
-  const city = el.querySelector('.city');
-  return (t) => {
-    const c = cards.find((k) => t > k.at - 0.5 && t < k.at + 0.7);
-    if (!c) { el.style.visibility = 'hidden'; return; }
-    el.style.visibility = 'visible';
-    uf.textContent = c.uf;
-    city.textContent = c.name;
-    const inX = lerp(L.W, 0, ease.inOutCubic(prog(t, c.at - 0.45, c.at - 0.05)));
-    const outX = lerp(0, -L.W, ease.inOutCubic(prog(t, c.at + 0.25, c.at + 0.65)));
-    el.style.transform = `translate3d(${t < c.at ? inX : outX}px, 0, 0)`;
-    city.style.transform = `translate3d(${(1 - ease.outExpo(prog(t, c.at - 0.3, c.at + 0.2))) * 120}px, 0, 0)`;
-  };
-}
-
 // A floating legend pill over the map: colour chips, or any html (a ramp).
 export function Legend(r, items, { bottom = 330 } = {}) {
   const el = r.appendChild(h('div', 'legend legend-bar', typeof items === 'string' ? items : chips(items)));
@@ -221,4 +203,25 @@ export function Ruler(r, { a, b, label, labels = [], color = '#16181b' }) {
       el.style.transform = `translate3d(${P[0]}px, ${P[1] + 26}px, 0) translate(-50%, 0) scale(${Math.max(0, spring(t - (tin + 0.3 + i * 0.5), { freq: 1.8, damping: 0.6 })) * out})`;
     });
   };
+}
+
+// A ring that springs in around a point (to find a tiny unit-chart block).
+export function Ring(r, { x, y, d, color }) {
+  const el = r.appendChild(h('div', 'ring-callout'));
+  Object.assign(el.style, { left: `${x}px`, top: `${y}px`, width: `${d}px`, height: `${d}px`, borderColor: color });
+  return (t, tin, tout) => {
+    const s = spring(t - tin, { freq: 1.7, damping: 0.5 });
+    const out = 1 - ease.inCubic(prog(t, tout - 0.3, tout));
+    el.style.visibility = t > tin && t < tout ? 'visible' : 'hidden';
+    el.style.transform = `translate(-50%, -50%) scale(${Math.max(0, s) * out})`;
+  };
+}
+
+// A caption pinned to a screen position (unit-chart labels).
+export function Label(r, { x, y, html, color = '#16181b' }) {
+  const el = r.appendChild(h('div', 'map-label', html));
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  el.style.color = color;
+  return (t, tin, tout) => fade(el, t, tin, tout, { dy: 10 });
 }

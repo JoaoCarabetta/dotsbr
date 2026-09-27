@@ -92,6 +92,7 @@ export const regionCam = (L, bbox) => ({ ...fitBounds(bbox, L.brazilRect), beari
 export const REGION_BOXES = {
   Sul: [-57.7, -33.8, -48.0, -22.5],
   Norte: [-74, -13.7, -46, 5.3],
+  Nordeste: [-48.8, -18.4, -34.7, -1.0],
 };
 
 export const place = ({ lon, lat, zoom, px, py, pitch = 0, bearing = 0 }) => ({ x: lon2x(lon), y: lat2y(lat), zoom, px, py, pitch, bearing });

@@ -66,3 +66,24 @@ export function wordTargets(dots, ds, view, samples, L, key = 'word') {
   dots.setTarget(ds, key, out);
   return pick.length;
 }
+
+// A unit chart: `count` dots starting at index `from` (datasets are shuffled
+// at extract time, so any index range is a random sample of people) packed
+// into a grid of `cols` columns, filled left to right by where each dot
+// starts on screen. Returns the grid's box for labels.
+export function blockTargets(dots, ds, view, { from = 0, count, x, y, cols, pitch }, key) {
+  const set = dots.sets[ds];
+  const rand = mulberry32(13 + from);
+  const idx = Array.from({ length: Math.min(count, set.count - from) }, (_, k) => from + k);
+  const sx = idx.map((i) => view.project(...mercOf(dots, set, i))[0]);
+  const order = idx.map((_, k) => k).sort((a, b) => sx[a] - sx[b]);
+  const rows = Math.ceil(idx.length / cols);
+  const out = new Float32Array(set.count * 3);
+  order.forEach((k, slot) => {
+    const col = Math.floor(slot / rows);
+    const row = slot % rows;
+    out.set([x + col * pitch + (rand() - 0.5) * pitch * 0.25, y + row * pitch + (rand() - 0.5) * pitch * 0.25, 1], idx[k] * 3);
+  });
+  dots.setTarget(ds, key, out);
+  return { x, y, w: Math.ceil(idx.length / rows) * pitch, h: rows * pitch };
+}
